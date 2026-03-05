@@ -1,0 +1,5 @@
+target/
+vscode/node_modules/
+vscode/.vscode-test/
+temp
+kerml-parser/test-logs/
