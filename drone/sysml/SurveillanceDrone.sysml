@@ -75,7 +75,10 @@ package SurveillanceDrone {
 
 	part def Propulsion {
 		doc /* Four propulsion units for quadrotor lift and thrust. */
-		part propulsionUnits[4] : PropulsionUnit;
+		part propulsionUnit1 : PropulsionUnit;
+		part propulsionUnit2 : PropulsionUnit;
+		part propulsionUnit3 : PropulsionUnit;
+		part propulsionUnit4 : PropulsionUnit;
 		attribute thrustTotal : Real;
 	}
 
@@ -189,10 +192,10 @@ package SurveillanceDrone {
 		part power : Power;
 
 		// Connections per README §6
-		connect flightControl.flightController.motorCmd to propulsion.propulsionUnits[1].cmd;
-		connect flightControl.flightController.motorCmd to propulsion.propulsionUnits[2].cmd;
-		connect flightControl.flightController.motorCmd to propulsion.propulsionUnits[3].cmd;
-		connect flightControl.flightController.motorCmd to propulsion.propulsionUnits[4].cmd;
+		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit1.cmd;
+		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit2.cmd;
+		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit3.cmd;
+		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit4.cmd;
 		connect flightControl.flightController.gimbalCmd to gimbal.cmd;
 		connect gimbal.cameraCtrl to cameraPayload.control;
 		connect cameraPayload.videoOut to communication.videoIn;
@@ -202,10 +205,10 @@ package SurveillanceDrone {
 		connect power.distribution.regulated5V to gimbal.pwr;
 		connect power.distribution.regulated5V to cameraPayload.pwr;
 		connect power.distribution.regulated5V to communication.pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnits[1].pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnits[2].pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnits[3].pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnits[4].pwr;
+		connect power.distribution.regulated5V to propulsion.propulsionUnit1.pwr;
+		connect power.distribution.regulated5V to propulsion.propulsionUnit2.pwr;
+		connect power.distribution.regulated5V to propulsion.propulsionUnit3.pwr;
+		connect power.distribution.regulated5V to propulsion.propulsionUnit4.pwr;
 	}
 
 	// ========== Requirements (README §5) ==========
@@ -354,12 +357,16 @@ package SurveillanceDrone {
 		doc /* Capture and output video stream. */
 	}
 
-	// Parts perform actions
+	// Parts perform actions; allocations use named action usages (source/target must be usages per spec 7.15).
 	part def SurveillanceQuadrotorDroneWithBehavior :> SurveillanceQuadrotorDrone {
-		perform action ExecutePatrol;
-		perform action ExecuteOrbit;
-		perform action ControlGimbal;
-		perform action CaptureVideo;
+		perform action executePatrol : ExecutePatrol;
+		perform action executeOrbit : ExecuteOrbit;
+		perform action controlGimbal : ControlGimbal;
+		perform action captureVideo : CaptureVideo;
+		allocate executePatrol to flightControl;
+		allocate executeOrbit to flightControl;
+		allocate controlGimbal to gimbal;
+		allocate captureVideo to cameraPayload;
 	}
 
 	// ========== State machine - Flight modes ==========
@@ -400,9 +407,4 @@ package SurveillanceDrone {
 		capacity / currentDraw
 	}
 
-	// ========== Allocations (to part usages in drone instance) ==========
-	allocate ExecutePatrol to droneInstance.flightControl;
-	allocate ExecuteOrbit to droneInstance.flightControl;
-	allocate ControlGimbal to droneInstance.gimbal;
-	allocate CaptureVideo to droneInstance.cameraPayload;
 }

@@ -18,4 +18,4 @@ SysML v2 textual notation as in the [SysML v2 Language Specification](https://ww
 
 ## Propulsion
 
-Propulsion is modeled as one **Propulsion** part containing **4× PropulsionUnit** (each unit: motor + ESC + propeller with command and power ports).
+Propulsion is modeled as one **Propulsion** part containing four named part usages: **propulsionUnit1**, **propulsionUnit2**, **propulsionUnit3**, **propulsionUnit4** (each a PropulsionUnit: motor + ESC + propeller with command and power ports). Named usages are used so that each unit can be referenced in `connect` statements per SysML v2 feature-chain syntax.
