@@ -6,12 +6,13 @@
 package SurveillanceDrone {
 	doc /* Root package for the surveillance quadrotor drone example. */
 
-	// ========== Value types (simplified) ==========
-	attribute def Real;
-	attribute def MassValue;
-	attribute def TimeValue;
-	attribute def DistanceValue;
-	attribute def SpeedValue;
+	// ========== Standard library imports ==========
+	private import ScalarValues::Real;
+	private import ScalarValues::String;
+	private import ISQBase::MassValue;
+	private import ISQBase::LengthValue;
+	private import ISQBase::DurationValue;
+	private import ISQSpaceTime::SpeedValue;
 
 	// ========== Port definitions (interfaces) ==========
 	port def MotorCommandPort {
@@ -147,8 +148,8 @@ package SurveillanceDrone {
 
 	part def Communication {
 		doc /* C2 link, telemetry, video downlink. */
-		attribute range : DistanceValue;
-		attribute latency : TimeValue;
+		attribute range : LengthValue;
+		attribute latency : DurationValue;
 		attribute bandwidth : Real;
 		port c2In : RCCommandPort;
 		port telemetryIn : ~TelemetryPort;
@@ -174,7 +175,7 @@ package SurveillanceDrone {
 		doc /* Battery + PDB; supplies all onboard systems. */
 		part battery : Battery;
 		part distribution : PowerDistribution;
-		attribute flightTimeNominal : TimeValue;
+		attribute flightTimeNominal : DurationValue;
 	}
 
 	// ========== Top-level system ==========

@@ -4,12 +4,11 @@
 package KitchenTimer {
 	doc /* Root package for the kitchen timer example. */
 
-	// ========== Value types ==========
-	attribute def Integer;
-	attribute def Real;
-	attribute def TimeValue;
-	attribute def String;
-	attribute def Boolean;
+	// ========== Standard library imports ==========
+	private import ScalarValues::Real;
+	private import ScalarValues::String;
+	private import ScalarValues::Boolean;
+	private import ISQBase::DurationValue;
 	private import SI::V;
 	private import SI::A;
 	private import ISQElectromagnetism::electricPower;
@@ -81,7 +80,7 @@ package KitchenTimer {
 
 	part def Buzzer {
 		doc /* Piezo or similar; has only +/- terminals; buzzes when power is applied. */
-		attribute duration : TimeValue;
+		attribute duration : DurationValue;
 		port pwr : ~BatteryOutlet { :>> maxCurrent = 0.05 [A]; }  // ~50 mA when active
 	}
 
@@ -102,7 +101,7 @@ package KitchenTimer {
 		doc /* Power supply for all subsystems; e.g. 3xAAA. */
 		attribute capacity : Real;
 		attribute voltage : Real;
-		attribute runtimeEstimate : TimeValue;
+		attribute runtimeEstimate : DurationValue;
 		port powerOut : BatteryOutlet;
 	}
 
@@ -273,8 +272,8 @@ package KitchenTimer {
 	// ========== Optional: parametrics ==========
 	constraint def TimerAccuracyConstraint {
 		doc /* Accuracy bounded by tick rate and elapsed time. */
-		in tickRate : TimeValue;
-		in elapsedTime : TimeValue;
+		in tickRate : DurationValue;
+		in elapsedTime : DurationValue;
 		in errorBound : Real;
 		errorBound >= 0
 	}
@@ -283,10 +282,9 @@ package KitchenTimer {
 		doc /* Runtime = f(capacity, load current). */
 		in capacity : Real;
 		in loadCurrent : Real;
-		in runtime : TimeValue;
+		in runtime : DurationValue;
 		runtime >= capacity / loadCurrent
 	}
 
 }
-
 

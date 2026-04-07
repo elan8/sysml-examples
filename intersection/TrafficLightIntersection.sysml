@@ -6,11 +6,11 @@
 package TrafficLightIntersection {
 	doc /* Root package for the traffic light intersection example. */
 
-	// ========== Value types ==========
-	attribute def Real;
-	attribute def TimeValue;
-	attribute def String;
-	attribute def Boolean;
+	// ========== Standard library imports ==========
+	private import ScalarValues::Real;
+	private import ScalarValues::String;
+	private import ScalarValues::Boolean;
+	private import ISQBase::DurationValue;
 
 	// ========== Port definitions (README §8) ==========
 	port def LampCommandPort {
@@ -41,11 +41,11 @@ package TrafficLightIntersection {
 
 	part def IntersectionController {
 		doc /* Logic and timing; runs phase state machine. */
-		attribute minGreen : TimeValue;
-		attribute maxGreen : TimeValue;
-		attribute yellowTime : TimeValue;
-		attribute allRedTime : TimeValue;
-		attribute cycleLength : TimeValue;
+		attribute minGreen : DurationValue;
+		attribute maxGreen : DurationValue;
+		attribute yellowTime : DurationValue;
+		attribute allRedTime : DurationValue;
+		attribute cycleLength : DurationValue;
 		port mainLampOut : LampCommandPort;
 		port sideLampOut : LampCommandPort;
 		port detectorIn : ~DetectorOutputPort;
@@ -232,7 +232,7 @@ package TrafficLightIntersection {
 		doc /* Yellow time >= f(speed, distance) for clearance. */
 		in approachSpeed : Real;
 		in clearanceDistance : Real;
-		in yellowTime : TimeValue;
+		in yellowTime : DurationValue;
 		yellowTime >= clearanceDistance / approachSpeed
 	}
 
