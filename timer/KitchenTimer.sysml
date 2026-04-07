@@ -43,18 +43,6 @@ package KitchenTimer {
 		out buzzerOn : Boolean;
 	}
 
-	interface def BuzzerPowerConnection {
-		doc /* Switched power from driver to buzzer +/− terminals. */
-		end port source : BatteryOutlet;
-		end port load : ~BatteryOutlet;
-	}
-
-	interface def PowerSupply {
-		doc /* Power from battery to a load; typed electrical interface. */
-		end port source : BatteryOutlet;
-		end port load : ~BatteryOutlet;
-	}
-
 	// ========== Part definitions (README §3, §4) ==========
 	// ========== Implementation-level parts ==========
 	part def Microcontroller {
@@ -125,15 +113,13 @@ package KitchenTimer {
 		part battery : Battery;
 		part buzzer : Buzzer;
 
-		// Switched power: driver → buzzer +/- terminals
-		interface : BuzzerPowerConnection connect
-		source ::> pcb.buzzerDriver.buzzerPwrOut to
-		load ::> buzzer.pwr;
-		// Power: battery → PCB loads
-		interface : PowerSupply connect source ::> battery.powerOut to load ::> pcb.mcu.pwr;
-		interface : PowerSupply connect source ::> battery.powerOut to load ::> pcb.display.pwr;
-		interface : PowerSupply connect source ::> battery.powerOut to load ::> pcb.buttons.pwr;
-		interface : PowerSupply connect source ::> battery.powerOut to load ::> pcb.buzzerDriver.pwrIn;
+		// Power: BatteryOutlet → ~BatteryOutlet (fan-out from battery to PCB loads)
+		connect battery.powerOut to pcb.mcu.pwr;
+		connect battery.powerOut to pcb.display.pwr;
+		connect battery.powerOut to pcb.buttons.pwr;
+		connect battery.powerOut to pcb.buzzerDriver.pwrIn;
+		// Switched path: driver output → buzzer load
+		connect pcb.buzzerDriver.buzzerPwrOut to buzzer.pwr;
 	}
 
 	// ========== State machine (README §5) ==========
