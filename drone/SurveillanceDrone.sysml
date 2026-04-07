@@ -69,7 +69,7 @@ package SurveillanceDrone {
 		attribute thrust : Real;
 		attribute hoverThrottle : Real;
 		attribute maxCurrent : Real;
-		port cmd : ~MotorCommandPort;
+		port cmd : MotorCommandPort;
 		port pwr : ~PowerPort;
 	}
 
@@ -129,7 +129,7 @@ package SurveillanceDrone {
 		attribute tiltRange : Real;
 		attribute maxAngularRate : Real;
 		attribute payloadCapacity : MassValue;
-		port cmd : ~GimbalCommandPort;
+		port cmd : GimbalCommandPort;
 		port cameraCtrl : CameraControlPort;
 		port pwr : ~PowerPort;
 	}
@@ -181,7 +181,6 @@ package SurveillanceDrone {
 	part def SurveillanceQuadrotorDrone {
 		doc /*
 		 * Surveillance quadrotor UAV with gimbal-mounted cameras.
-		 * Structure per README §4; interfaces per §6.
 		 */
 		part airframe : Airframe;
 		part propulsion : Propulsion;
@@ -335,6 +334,35 @@ package SurveillanceDrone {
 		in route : String;
 		out status : String;
 		doc /* Execute patrol/overwatch mission along route. */
+
+		action validateRoute {
+			in route : String = ExecutePatrol::route;
+			out validationStatus : String;
+		};
+
+		action startMission {
+			in route : String = ExecutePatrol::route;
+			out missionStarted : String;
+		};
+
+		action flyRoute {
+			in route : String = ExecutePatrol::route;
+			out progressStatus : String;
+		};
+
+		action capture : CaptureVideo { out videoStream; };
+
+		action finishMission {
+			in progressStatus : String = flyRoute::progressStatus;
+			out missionStatus : String;
+		};
+
+		first validateRoute then startMission;
+		first startMission then flyRoute;
+		first flyRoute then capture;
+		first capture then finishMission;
+
+		bind status = finishMission::missionStatus;
 	}
 
 	action def ExecuteOrbit {
@@ -343,6 +371,33 @@ package SurveillanceDrone {
 		in altitude : Real;
 		out status : String;
 		doc /* Orbit around point of interest. */
+
+		action validateOrbitParams {
+			in center : String = ExecuteOrbit::center;
+			in radius : Real = ExecuteOrbit::radius;
+			in altitude : Real = ExecuteOrbit::altitude;
+			out validationStatus : String;
+		};
+
+		action goToCenter {
+			in center : String = ExecuteOrbit::center;
+			out arrivedStatus : String;
+		};
+
+		action engageOrbit {
+			in center : String = ExecuteOrbit::center;
+			in radius : Real = ExecuteOrbit::radius;
+			in altitude : Real = ExecuteOrbit::altitude;
+			out orbitStatus : String;
+		};
+
+		action capture : CaptureVideo { out videoStream; };
+
+		first validateOrbitParams then goToCenter;
+		first goToCenter then engageOrbit;
+		first engageOrbit then capture;
+
+		bind status = engageOrbit::orbitStatus;
 	}
 
 	action def ControlGimbal {
@@ -350,11 +405,47 @@ package SurveillanceDrone {
 		in tiltAngle : Real;
 		in mode : String;
 		doc /* Command gimbal pointing and mode. */
+
+		action sanitizeCommand {
+			in panAngle : Real = ControlGimbal::panAngle;
+			in tiltAngle : Real = ControlGimbal::tiltAngle;
+			in mode : String = ControlGimbal::mode;
+			out sanitizedPan : Real;
+			out sanitizedTilt : Real;
+			out sanitizedMode : String;
+		}
+
+		action sendCommand {
+			in panAngle : Real = sanitizeCommand::sanitizedPan;
+			in tiltAngle : Real = sanitizeCommand::sanitizedTilt;
+			in mode : String = sanitizeCommand::sanitizedMode;
+		}
+
+		first sanitizeCommand then sendCommand;
 	}
 
 	action def CaptureVideo {
 		out videoStream : String;
 		doc /* Capture and output video stream. */
+
+		action startCapture {
+			out captureStatus : String;
+		}
+
+		action encodeStream {
+			in captureStatus : String = startCapture::captureStatus;
+			out encodedStream : String;
+		}
+
+		action publishStream {
+			in encodedStream : String = encodeStream::encodedStream;
+			out publishedStream : String;
+		}
+
+		first startCapture then encodeStream;
+		first encodeStream then publishStream;
+
+		bind videoStream = publishStream::publishedStream;
 	}
 
 	// Parts perform actions; allocations use named action usages (source/target must be usages per spec 7.15).
@@ -379,6 +470,21 @@ package SurveillanceDrone {
 	state def RTL;
 	state def Landing;
 
+	// Triggers for flight-mode transitions (operator commands + failsafes)
+	item def ManualSelected;
+	item def AttitudeHoldSelected;
+	item def GPSHoldSelected;
+	item def WaypointSelected;
+	item def OrbitSelected;
+	item def FollowSelected;
+	item def RTLCommanded;
+	item def LandingCommanded;
+	item def DisarmCommanded;
+	item def C2LinkLost;
+	item def LowBattery;
+	item def CriticalSensorFailure;
+	item def Recovered;
+
 	state def FlightModeStateMachine {
 		state manual : Manual;
 		state attitudeHold : AttitudeHold;
@@ -388,6 +494,85 @@ package SurveillanceDrone {
 		state follow : Follow;
 		state rtl : RTL;
 		state landing : Landing;
+
+		entry;
+		then manual;
+
+		// --- Operator commanded mode changes ---
+		transition to_attitude_from_manual first manual accept AttitudeHoldSelected then attitudeHold;
+		transition to_gpshold_from_manual first manual accept GPSHoldSelected then gpsHold;
+		transition to_waypoint_from_manual first manual accept WaypointSelected then waypoint;
+		transition to_orbit_from_manual first manual accept OrbitSelected then orbit;
+		transition to_follow_from_manual first manual accept FollowSelected then follow;
+		transition to_rtl_from_manual first manual accept RTLCommanded then rtl;
+		transition to_landing_from_manual first manual accept LandingCommanded then landing;
+
+		transition to_manual_from_attitude first attitudeHold accept ManualSelected then manual;
+		transition to_gpshold_from_attitude first attitudeHold accept GPSHoldSelected then gpsHold;
+		transition to_waypoint_from_attitude first attitudeHold accept WaypointSelected then waypoint;
+		transition to_orbit_from_attitude first attitudeHold accept OrbitSelected then orbit;
+		transition to_follow_from_attitude first attitudeHold accept FollowSelected then follow;
+		transition to_rtl_from_attitude first attitudeHold accept RTLCommanded then rtl;
+		transition to_landing_from_attitude first attitudeHold accept LandingCommanded then landing;
+
+		transition to_manual_from_gpshold first gpsHold accept ManualSelected then manual;
+		transition to_attitude_from_gpshold first gpsHold accept AttitudeHoldSelected then attitudeHold;
+		transition to_waypoint_from_gpshold first gpsHold accept WaypointSelected then waypoint;
+		transition to_orbit_from_gpshold first gpsHold accept OrbitSelected then orbit;
+		transition to_follow_from_gpshold first gpsHold accept FollowSelected then follow;
+		transition to_rtl_from_gpshold first gpsHold accept RTLCommanded then rtl;
+		transition to_landing_from_gpshold first gpsHold accept LandingCommanded then landing;
+
+		transition to_manual_from_waypoint first waypoint accept ManualSelected then manual;
+		transition to_attitude_from_waypoint first waypoint accept AttitudeHoldSelected then attitudeHold;
+		transition to_gpshold_from_waypoint first waypoint accept GPSHoldSelected then gpsHold;
+		transition to_orbit_from_waypoint first waypoint accept OrbitSelected then orbit;
+		transition to_follow_from_waypoint first waypoint accept FollowSelected then follow;
+		transition to_rtl_from_waypoint first waypoint accept RTLCommanded then rtl;
+		transition to_landing_from_waypoint first waypoint accept LandingCommanded then landing;
+
+		transition to_manual_from_orbit first orbit accept ManualSelected then manual;
+		transition to_attitude_from_orbit first orbit accept AttitudeHoldSelected then attitudeHold;
+		transition to_gpshold_from_orbit first orbit accept GPSHoldSelected then gpsHold;
+		transition to_waypoint_from_orbit first orbit accept WaypointSelected then waypoint;
+		transition to_follow_from_orbit first orbit accept FollowSelected then follow;
+		transition to_rtl_from_orbit first orbit accept RTLCommanded then rtl;
+		transition to_landing_from_orbit first orbit accept LandingCommanded then landing;
+
+		transition to_manual_from_follow first follow accept ManualSelected then manual;
+		transition to_attitude_from_follow first follow accept AttitudeHoldSelected then attitudeHold;
+		transition to_gpshold_from_follow first follow accept GPSHoldSelected then gpsHold;
+		transition to_waypoint_from_follow first follow accept WaypointSelected then waypoint;
+		transition to_orbit_from_follow first follow accept OrbitSelected then orbit;
+		transition to_rtl_from_follow first follow accept RTLCommanded then rtl;
+		transition to_landing_from_follow first follow accept LandingCommanded then landing;
+
+		// --- Failsafe transitions to RTL (README §5: RTL or land) ---
+		transition failsafe_rtl_c2loss first manual accept C2LinkLost then rtl;
+		transition failsafe_rtl_c2loss_ah first attitudeHold accept C2LinkLost then rtl;
+		transition failsafe_rtl_c2loss_gps first gpsHold accept C2LinkLost then rtl;
+		transition failsafe_rtl_c2loss_wp first waypoint accept C2LinkLost then rtl;
+		transition failsafe_rtl_c2loss_orbit first orbit accept C2LinkLost then rtl;
+		transition failsafe_rtl_c2loss_follow first follow accept C2LinkLost then rtl;
+
+		transition failsafe_rtl_lowbat first manual accept LowBattery then rtl;
+		transition failsafe_rtl_lowbat_ah first attitudeHold accept LowBattery then rtl;
+		transition failsafe_rtl_lowbat_gps first gpsHold accept LowBattery then rtl;
+		transition failsafe_rtl_lowbat_wp first waypoint accept LowBattery then rtl;
+		transition failsafe_rtl_lowbat_orbit first orbit accept LowBattery then rtl;
+		transition failsafe_rtl_lowbat_follow first follow accept LowBattery then rtl;
+
+		transition failsafe_rtl_sensor first manual accept CriticalSensorFailure then rtl;
+		transition failsafe_rtl_sensor_ah first attitudeHold accept CriticalSensorFailure then rtl;
+		transition failsafe_rtl_sensor_gps first gpsHold accept CriticalSensorFailure then rtl;
+		transition failsafe_rtl_sensor_wp first waypoint accept CriticalSensorFailure then rtl;
+		transition failsafe_rtl_sensor_orbit first orbit accept CriticalSensorFailure then rtl;
+		transition failsafe_rtl_sensor_follow first follow accept CriticalSensorFailure then rtl;
+
+		// --- RTL/Landing handling ---
+		transition rtl_to_landing first rtl accept LandingCommanded then landing;
+		transition rtl_recover_to_gpshold first rtl accept Recovered then gpsHold;
+		transition landing_to_manual_disarm first landing accept DisarmCommanded then manual;
 	}
 
 	// ========== Parametrics ==========
