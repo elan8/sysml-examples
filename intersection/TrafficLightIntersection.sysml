@@ -53,6 +53,11 @@ package TrafficLightIntersection {
 		exhibit state controllerMode : ControllerStateMachine;
 	}
 
+	part def OperatorPanel {
+		doc /* Local cabinet or remote input for mode commands (e.g. Normal / Flash). */
+		port commands : OperatorCommandPort;
+	}
+
 	// ========== Top-level system ==========
 	part def TrafficLightIntersection {
 		doc /* 4-way intersection with controller, signal heads, optional detector. */
@@ -60,10 +65,12 @@ package TrafficLightIntersection {
 		part mainStreetSignals : SignalHead;
 		part sideStreetSignals : SignalHead;
 		part detector : Detector;
+		part operatorPanel : OperatorPanel;
 
 		connect controller.mainLampOut to mainStreetSignals.cmd;
 		connect controller.sideLampOut to sideStreetSignals.cmd;
 		connect detector.output to controller.detectorIn;
+		connect operatorPanel.commands to controller.operatorIn;
 	}
 
 	// ========== State machine - Phase states (README §5.1, §5.2) ==========

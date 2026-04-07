@@ -43,34 +43,10 @@ package KitchenTimer {
 		out buzzerOn : Boolean;
 	}
 
-	interface def BuzzerControlConnection {
-		doc /* MCU GPIO to buzzer driver transistor (same port type, conjugate on driver). */
-		end port source : BuzzerCommandPort;
-		end port driver : ~BuzzerCommandPort;
-	}
-
 	interface def BuzzerPowerConnection {
 		doc /* Switched power from driver to buzzer +/− terminals. */
 		end port source : BatteryOutlet;
 		end port load : ~BatteryOutlet;
-	}
-
-	interface def ButtonToController {
-		doc /* Button events from user interface to controller. */
-		end port buttons : ButtonInputPort;
-		end port controllerIn : ~ButtonInputPort;
-	}
-
-	interface def DisplayConnection {
-		doc /* Logical: display value from controller to display. */
-		end port source : DisplayCommandPort;
-		end port display : ~DisplayCommandPort;
-	}
-
-	interface def LcdSegmentConnection {
-		doc /* Physical: MCU LCD controller COM/SEG drive to segment LCD glass. */
-		end port source : LcdSegmentDrivePort;
-		end port glass : ~LcdSegmentDrivePort;
 	}
 
 	interface def PowerSupply {
@@ -80,17 +56,6 @@ package KitchenTimer {
 	}
 
 	// ========== Part definitions (README §3, §4) ==========
-	// Logical controller behavior; realized by Microcontroller firmware.
-	part def TimerController {
-		doc /* Logic, countdown, state machine; runs phase states. */
-		attribute minValue : Integer;
-		attribute maxValue : Integer;
-		attribute tickRate : TimeValue;
-		port buttonIn : ~ButtonInputPort;
-		port displayOut : DisplayCommandPort;
-		port buzzerOut : BuzzerCommandPort;
-	}
-
 	// ========== Implementation-level parts ==========
 	part def Microcontroller {
 		doc /* MCU on PCB with built-in LCD controller; runs timer firmware; COM/SEG to display glass, GPIO to buttons. */
@@ -138,6 +103,11 @@ package KitchenTimer {
 		part display : Display;
 		part buttons : ButtonInterface;
 		part buzzerDriver : BuzzerDriver;
+		// Internal signal paths (power and external buzzer wired at KitchenTimer)
+		connect buttons.output to mcu.buttonIn;
+		connect mcu.displayOut to display.cmd;
+		connect mcu.lcdDrive to display.lcdIn;
+		connect mcu.buzzerOut to buzzerDriver.ctrlIn;
 	}
 
 	part def Battery {
@@ -155,22 +125,6 @@ package KitchenTimer {
 		part battery : Battery;
 		part buzzer : Buzzer;
 
-		// Logical: buttons → MCU
-		interface : ButtonToController connect
-		buttons ::> pcb.buttons.output to
-		controllerIn ::> pcb.mcu.buttonIn;
-		// Logical: display value (MCU firmware → display)
-		interface : DisplayConnection connect
-		source ::> pcb.mcu.displayOut to
-		display ::> pcb.display.cmd;
-		// Physical: MCU LCD controller COM/SEG → segment LCD glass
-		interface : LcdSegmentConnection connect
-		source ::> pcb.mcu.lcdDrive to
-		glass ::> pcb.display.lcdIn;
-		// MCU GPIO → buzzer driver transistor
-		interface : BuzzerControlConnection connect
-		source ::> pcb.mcu.buzzerOut to
-		driver ::> pcb.buzzerDriver.ctrlIn;
 		// Switched power: driver → buzzer +/- terminals
 		interface : BuzzerPowerConnection connect
 		source ::> pcb.buzzerDriver.buzzerPwrOut to
@@ -224,7 +178,6 @@ package KitchenTimer {
 		transition to_idle_from_expired first expired accept ResetPressed then idle;
 	}
 
-	// ========== Requirements (README §7) ==========
 	requirement def TimerRangeReq {
 		subject timer : KitchenTimer;
 		doc /* Support 1-99 minutes (or 0:01-99:59). */
@@ -349,4 +302,5 @@ package KitchenTimer {
 	}
 
 }
+
 

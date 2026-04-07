@@ -199,15 +199,21 @@ package SurveillanceDrone {
 		connect gimbal.cameraCtrl to cameraPayload.control;
 		connect cameraPayload.videoOut to communication.videoIn;
 		connect flightControl.flightController.telemetryOut to communication.telemetryIn;
+		connect communication.c2In to flightControl.flightController.rcIn;
 		connect power.battery.pwrOut to power.distribution.mainPower;
+		// Avionics and payload: 5 V rail
 		connect power.distribution.regulated5V to flightControl.flightController.pwr;
+		connect power.distribution.regulated5V to flightControl.imu.pwr;
+		connect power.distribution.regulated5V to flightControl.barometer.pwr;
+		connect power.distribution.regulated5V to flightControl.gnss.pwr;
 		connect power.distribution.regulated5V to gimbal.pwr;
 		connect power.distribution.regulated5V to cameraPayload.pwr;
 		connect power.distribution.regulated5V to communication.pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnit1.pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnit2.pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnit3.pwr;
-		connect power.distribution.regulated5V to propulsion.propulsionUnit4.pwr;
+		// Propulsion ESCs: battery nominal / 12 V rail (simplified)
+		connect power.distribution.regulated12V to propulsion.propulsionUnit1.pwr;
+		connect power.distribution.regulated12V to propulsion.propulsionUnit2.pwr;
+		connect power.distribution.regulated12V to propulsion.propulsionUnit3.pwr;
+		connect power.distribution.regulated12V to propulsion.propulsionUnit4.pwr;
 	}
 
 	// ========== Requirements (README §5) ==========
