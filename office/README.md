@@ -1,31 +1,48 @@
-# Office Workstation — Project Description
+# Office Workstation
 
-A SysML v2 example project for a **desk workstation setup**.  
-This model demonstrates a compact but complete pattern with:
+This is the smallest example in the repository. It is designed as a quick first read for learners who want to see a compact SysML v2 text model with typed ports, simple structural connections, a small state machine, and basic `satisfy` relationships.
 
-- typed interfaces and structural connections,
-- a small operational state machine on the laptop,
-- requirements with `satisfy` traces,
-- basic use cases.
+## What This Example Demonstrates
 
----
+- typed interfaces and explicit structural connections
+- a small operational state machine on the laptop
+- simple requirements with `satisfy` traces
+- a lightweight use-case layer
 
-## 1. Project Overview
+## What Is Intentionally Simplified
 
-### 1.1 Purpose
+- the model stays at desk-setup level and does not try to model networking, software deployment, thermal behavior, or ergonomics
+- interface typing is kept simple so the example stays readable for first-time learners
+- the requirements are illustrative and are not meant to represent a full verification-ready specification
+
+## What To Inspect In The Model
+
+- `OfficeDeskSetup` for the main parts and connections
+- the port definitions for the power, HDMI, and USB examples
+- `WorkSessionStateMachine` for the smallest behavior example in the repo
+- `officeInstance` and the `satisfy` usages for traceability
+
+## Known Limitations
+
+- this example optimizes for readability over strict realism
+- it is intentionally smaller and less formal than the timer, intersection, and drone examples
+
+## File
+
+- [office.sysml](office.sysml) - complete SysML v2 model for this example
+
+## Detailed Description
+
+### Purpose
 
 Model a realistic office workstation used for engineering and analysis tasks: laptop, monitor, keyboard, mouse, and wall power.
 
-### 1.2 Scope
+### Scope
 
-- **In scope:** wiring/connectivity at system level (power, HDMI, USB), session behavior (active/locked/off), and high-level performance/availability requirements.
-- **Out of scope:** network architecture, OS/software deployment details, thermal behavior, and enclosure ergonomics.
+- In scope: wiring and connectivity at system level, session behavior, and high-level performance and availability requirements.
+- Out of scope: network architecture, OS and software deployment details, thermal behavior, and enclosure ergonomics.
 
----
-
-## 2. Model Contents
-
-## 2.1 Structure
+### Model Contents
 
 The top-level system is `OfficeDeskSetup` with:
 
@@ -43,48 +60,17 @@ Main connections:
 - `laptop.usb1 -> mouse.usb`
 - `laptop.usb2 -> keyboard.usb`
 
-### 2.2 Ports and interfaces
-
-Typed ports are used to keep connections explicit and checkable:
-
-- `ACOutletPort` / `~ACOutletPort`
-- `HdmiPort` / `~HdmiPort`
-- `UsbHostPort` / `~UsbHostPort`
-
-### 2.3 Behavior
-
 `Laptop` exhibits `WorkSessionStateMachine` with three states:
 
 - `PoweredOff`
 - `ActiveSession`
 - `IdleLocked`
 
-Events: `StartWork`, `LockScreen`, `ResumeWork`, `ShutdownWorkstation`.
-
-### 2.4 Requirements and traceability
-
 The model includes requirement definitions for:
 
-- laptop capability (`ProductivityComputerReq`),
-- external display support (`ExternalDisplayReq`),
-- input-device availability (`InputDeviceReq`),
-- continuous power (`ContinuousPowerReq`).
+- laptop capability (`ProductivityComputerReq`)
+- external display support (`ExternalDisplayReq`)
+- input-device availability (`InputDeviceReq`)
+- continuous power (`ContinuousPowerReq`)
 
-`officeInstance : OfficeDeskSetup` is used with `satisfy` relations to trace fulfillment.
-
-### 2.5 Use cases
-
-- `StartDeskWork`
-- `LockAndResume`
-
----
-
-## 3. File
-
-- **[`office.sysml`](office.sysml)** — complete SysML v2 model for this example.
-
----
-
-## 4. Relationship to other examples
-
-Compared with [timer](../timer/), [drone](../drone/), and [intersection](../intersection/), this example remains intentionally compact but now includes both **structure and behavior** with requirement traceability.
+Compared with the other examples, this one is intentionally minimal and serves as a quick orientation point before moving on to the richer timer example.

@@ -1,10 +1,10 @@
 /*
- * Surveillance Quadrotor Drone - SysML v2 model.
- * Derived from drone/README.md: §4 structure, §5 requirements, §3.2 use cases, §6 interfaces.
- * Propulsion modeled as 4x PropulsionUnit.
+ * Surveillance Quadrotor Drone - learner-focused SysML v2 worked example.
+ * This model is broader and less formalized than the smaller examples.
+ * Propulsion is modeled as 4x PropulsionUnit for readability.
  */
 package SurveillanceDrone {
-	doc /* Root package for the surveillance quadrotor drone example. */
+	doc /* Root package for a broad surveillance-drone teaching example. */
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::Real;
@@ -191,7 +191,7 @@ package SurveillanceDrone {
 		part communication : Communication;
 		part power : Power;
 
-		// Connections per README §6
+		// Connections summarized in the README interfaces section
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit1.cmd;
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit2.cmd;
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit3.cmd;
@@ -217,7 +217,7 @@ package SurveillanceDrone {
 		connect power.distribution.regulated12V to propulsion.propulsionUnit4.pwr;
 	}
 
-	// ========== Requirements (README §5) ==========
+	// ========== Requirements ==========
 	requirement def EnduranceReq {
 		subject drone : SurveillanceQuadrotorDrone;
 		doc /* Minimum flight time at nominal hover with standard payload. */
@@ -262,7 +262,7 @@ package SurveillanceDrone {
 
 	requirement def GimbalPanTiltReq {
 		subject gimbal : Gimbal;
-		doc /* 360° pan or sufficient range; tilt e.g. -90° to +30°. */
+		doc /* 360 deg pan or sufficient range; tilt e.g. -90 deg to +30 deg. */
 		require constraint { doc /* panRange >= 360; tiltRange covers -90 to +30. */ }
 	}
 
@@ -274,8 +274,8 @@ package SurveillanceDrone {
 
 	requirement def OperatingTempReq {
 		subject drone : SurveillanceQuadrotorDrone;
-		doc /* Operating temperature e.g. -10 °C to +45 °C. */
-		require constraint { doc /* Operate in -10 °C to +45 °C. */ }
+		doc /* Operating temperature e.g. -10 degC to +45 degC. */
+		require constraint { doc /* Operate in -10 degC to +45 degC. */ }
 	}
 
 	// Satisfy requirements by the drone (usage in context)
@@ -291,7 +291,7 @@ package SurveillanceDrone {
 	satisfy ControlModesReq by droneInstance;
 	satisfy OperatingTempReq by droneInstance;
 
-	// ========== Use cases (README §3.2) ==========
+	// ========== Use cases ==========
 	item def Operator;
 
 	use case def PatrolOverwatch {
@@ -554,7 +554,7 @@ package SurveillanceDrone {
 		transition to_rtl_from_follow first follow accept RTLCommanded then rtl;
 		transition to_landing_from_follow first follow accept LandingCommanded then landing;
 
-		// --- Failsafe transitions to RTL (README §5: RTL or land) ---
+		// --- Failsafe transitions to RTL (matching the README summary) ---
 		transition failsafe_rtl_c2loss first manual accept C2LinkLost then rtl;
 		transition failsafe_rtl_c2loss_ah first attitudeHold accept C2LinkLost then rtl;
 		transition failsafe_rtl_c2loss_gps first gpsHold accept C2LinkLost then rtl;

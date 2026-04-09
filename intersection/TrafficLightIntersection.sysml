@@ -1,10 +1,10 @@
 /*
- * Traffic Light Intersection - SysML v2 model.
- * Derived from intersection/README.md: §4 structure, §5 state machine, §6 use cases, §7 requirements, §8 interfaces.
- * Central artifact: intersection controller state machine (phase cycle + Normal/Flash modes).
+ * Traffic Light Intersection - learner-focused SysML v2 worked example.
+ * Central artifact: the intersection controller state machine with
+ * a small phase cycle and a simple Normal/Flash mode split.
  */
 package TrafficLightIntersection {
-	doc /* Root package for the traffic light intersection example. */
+	doc /* Root package for a compact traffic-light-controller teaching example. */
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::Real;
@@ -12,7 +12,7 @@ package TrafficLightIntersection {
 	private import ScalarValues::Boolean;
 	private import ISQBase::DurationValue;
 
-	// ========== Port definitions (README §8) ==========
+	// ========== Port definitions (README interfaces section) ==========
 	port def LampCommandPort {
 		out indication : String;
 	}
@@ -26,7 +26,7 @@ package TrafficLightIntersection {
 		in modeCommand : String;
 	}
 
-	// ========== Part definitions (README §4) ==========
+	// ========== Part definitions (README structure section) ==========
 	part def SignalHead {
 		doc /* Display Red, Yellow, Green to road users. */
 		attribute approachName : String;
@@ -73,7 +73,7 @@ package TrafficLightIntersection {
 		connect operatorPanel.commands to controller.operatorIn;
 	}
 
-	// ========== State machine - Phase states (README §5.1, §5.2) ==========
+	// ========== State machine - phase behavior ==========
 	state def PhaseA {
 		doc /* Main Street green; Side Street red. */
 	}
@@ -122,7 +122,7 @@ package TrafficLightIntersection {
 		transition to_normal first flash accept NormalCommand then normal;
 	}
 
-	// ========== Requirements (README §7) ==========
+	// ========== Requirements ==========
 	requirement def NoConflictingGreensReq {
 		subject intersection : TrafficLightIntersection;
 		doc /* No two conflicting movements shall have green simultaneously. */
@@ -167,7 +167,7 @@ package TrafficLightIntersection {
 	satisfy ModesReq by intersectionInstance.controller;
 	satisfy VisibilityReq by intersectionInstance;
 
-	// ========== Use cases (README §6) ==========
+	// ========== Use cases ==========
 	item def Operator;
 	item def RoadUser;
 

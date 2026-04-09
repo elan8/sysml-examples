@@ -1,8 +1,10 @@
 /*
-* Kitchen Timer - SysML v2 model.
-*/
+ * Kitchen Timer - learner-focused SysML v2 worked example.
+ * This model is intentionally compact and mixes structure,
+ * behavior, interfaces, and traceability for teaching purposes.
+ */
 package KitchenTimer {
-	doc /* Root package for the kitchen timer example. */
+	doc /* Root package for a compact kitchen timer teaching example. */
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::Real;
@@ -20,7 +22,7 @@ package KitchenTimer {
 		attribute maxCurrent = 0.5 [A];
 	}
 
-	// ========== Port definitions (README §8) ==========
+	// ========== Port definitions (README interfaces section) ==========
 	port def ButtonInputPort {
 		in startPressed : Boolean;
 		in stopPressed : Boolean;
@@ -42,7 +44,7 @@ package KitchenTimer {
 		out buzzerOn : Boolean;
 	}
 
-	// ========== Part definitions (README §3, §4) ==========
+	// ========== Part definitions (README structure sections) ==========
 	// ========== Implementation-level parts ==========
 	part def Microcontroller {
 		doc /* MCU on PCB with built-in LCD controller; runs timer firmware; COM/SEG to display glass, GPIO to buttons. */
@@ -112,16 +114,16 @@ package KitchenTimer {
 		part battery : Battery;
 		part buzzer : Buzzer;
 
-		// Power: BatteryOutlet → ~BatteryOutlet (fan-out from battery to PCB loads)
+		// Power: BatteryOutlet -> ~BatteryOutlet (fan-out from battery to PCB loads)
 		connect battery.powerOut to pcb.mcu.pwr;
 		connect battery.powerOut to pcb.display.pwr;
 		connect battery.powerOut to pcb.buttons.pwr;
 		connect battery.powerOut to pcb.buzzerDriver.pwrIn;
-		// Switched path: driver output → buzzer load
+		// Switched path: driver output -> buzzer load
 		connect pcb.buzzerDriver.buzzerPwrOut to buzzer.pwr;
 	}
 
-	// ========== State machine (README §5) ==========
+	// ========== State machine (README behavior section) ==========
 	state def Idle {
 		doc /* Timer not running; user can set time via +/-. */
 	}
@@ -166,7 +168,7 @@ package KitchenTimer {
 	requirement def TimerRangeReq {
 		subject timer : KitchenTimer;
 		doc /* Support 1-99 minutes (or 0:01-99:59). */
-		require constraint { doc /* minValue and maxValue define 1–99 min range. */ }
+		require constraint { doc /* minValue and maxValue define 1-99 min range. */ }
 	}
 
 	requirement def DisplayFormatReq {
@@ -177,7 +179,7 @@ package KitchenTimer {
 
 	requirement def AccuracyReq {
 		subject mcu : Microcontroller;
-		doc /* ±1 second per minute of elapsed time. */
+		doc /* +/-1 second per minute of elapsed time. */
 		require constraint { doc /* Tick rate and accumulation meet accuracy. */ }
 	}
 
@@ -214,7 +216,7 @@ package KitchenTimer {
 	satisfy StateConsistencyReq by timerInstance.pcb.mcu;
 	satisfy BatteryRuntimeReq by timerInstance.battery;
 
-	// ========== Use cases (README §6) ==========
+	// ========== Use cases (README use-cases section) ==========
 	item def User;
 
 	use case def SetAndStartTimer {
@@ -287,4 +289,3 @@ package KitchenTimer {
 	}
 
 }
-

@@ -1,9 +1,10 @@
 /*
- * Office workstation - SysML v2 model.
- * Focus: structure, typed interfaces, simple behavior, and requirements traceability.
+ * Office workstation - learner-focused SysML v2 worked example.
+ * Focus: small structure, typed interfaces, simple behavior,
+ * and basic requirements traceability.
  */
 package Office {
-	doc /* Root package for a typical engineering desk workstation. */
+	doc /* Root package for a compact office workstation teaching example. */
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::Real;
