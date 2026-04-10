@@ -2,6 +2,10 @@
 
 This example is the recommended first substantial model in the repository. It stays compact enough for learners to read in one sitting while still combining structure, state behavior, interfaces, requirements, use cases, and a small implementation view.
 
+## Purpose
+
+Model a countdown timer for cooking, workouts, and other timed tasks with a clear link between structure, behavior, requirements, and a compact implementation view.
+
 ## Why Start Here
 
 - it is the strongest end-to-end teaching example in the repo
@@ -36,49 +40,16 @@ This example is the recommended first substantial model in the repository. It st
 - the requirements remain lightweight and readable rather than fully verification-ready
 - the parametric constraints are illustrative support for the timing and runtime requirements, not a full analysis model
 
+## Validation And Tooling Notes
+
+- canonical validation target: [`spec42`](https://github.com/elan8/spec42)
+- this is the repository's flagship validated example
+- current goal: the file should load cleanly and publish no intended diagnostics in the `spec42` workflow
+- if you adapt the model to another SysML v2 tool, keep the teaching story and end-to-end coherence intact even if notation adjustments are required
+
 ## File
 
 - [KitchenTimer.sysml](KitchenTimer.sysml) - complete SysML v2 model for this example
-
-## Validation
-
-- canonical validation target: [`spec42`](https://github.com/elan8/spec42)
-- validated with the `spec42` language server workflow used by the VS Code extension
-- current goal: the file should load cleanly and publish no intended diagnostics for this flagship example
-
-## Detailed Description
-
-### Purpose
-
-The system is a countdown timer for cooking, workouts, and other timed tasks. It allows the user to set a duration, start the countdown, optionally pause and resume, and receive an audible alarm when time expires.
-
-### Scope
-
-- In scope: timer controller logic, display, button interface, buzzer, battery, and a compact implementation view.
-- Out of scope: packaging, enclosure design, charging infrastructure, and detailed battery chemistry.
-
-### Main Subsystems
-
-- `TimerController` or equivalent control logic represented by the state machine and MCU-related parts
-- display output for the remaining time
-- button input for start, stop, reset, increment, and decrement
-- buzzer behavior on expiration
-- battery and switched power flow
-
-### Main Behavior
-
-The central behavioral model is the timer state machine with these states:
-
-- `Idle`
-- `Running`
-- `Paused`
-- `Expired`
-
-Typical transitions are driven by user input events such as `StartPressed`, `StopPressed`, and `ResetPressed`, plus the internal `CountdownComplete` event.
-
-### Requirements And Traceability
-
-The example includes readable requirements for timer range, display format, timing accuracy, audibility, responsiveness, state consistency, and battery runtime. A concrete `timerInstance` is used to show `satisfy` traces against the relevant structural elements rather than only against the whole system.
 
 ## Walkthrough
 

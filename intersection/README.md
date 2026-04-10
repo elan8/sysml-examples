@@ -2,6 +2,10 @@
 
 This example is centered on controller behavior. It is useful for learners who want to study a phase-oriented state machine in a domain that is easy to reason about at system level.
 
+## Purpose
+
+Model a signalized intersection with a compact controller, signal heads, detector input, and an operator command path.
+
 ## What This Example Demonstrates
 
 - a controller-focused state machine with phase sequencing
@@ -27,32 +31,12 @@ This example is centered on controller behavior. It is useful for learners who w
 - this example keeps timing logic and safety constraints lightweight
 - several operational concepts are intentionally sketched rather than modeled in full detail
 
+## Validation And Tooling Notes
+
+- expected use: a behavior-focused example to inspect in a SysML v2-capable editor
+- validation stance: syntax and package loadability should be reviewed in your chosen tool, but this is not claimed as a fully validated traffic-control reference
+- if a tool reports differences in state or requirement notation, treat the model as an illustrative pattern rather than a standards-complete deployment model
+
 ## File
 
 - [TrafficLightIntersection.sysml](TrafficLightIntersection.sysml) - complete SysML v2 model for this example
-
-## Detailed Description
-
-### Purpose
-
-The system is a traffic signal installation that controls vehicle and pedestrian flow at a single intersection. It assigns right-of-way to different approaches in a safe, predictable sequence and can support special modes such as flashing or preemption.
-
-### Scope
-
-- In scope: the intersection controller, signal heads, a detector, operator input, and the phase-oriented behavior model.
-- Out of scope: adjacent intersections, central traffic-management integration, and a full standards-complete deployment model.
-
-### Simplified Phase Model
-
-For teaching purposes, the example focuses on a reduced phase sequence:
-
-- `Phase A`: Main Street green, Side Street red
-- `Phase B`: Main Street yellow, Side Street red
-- `Phase C`: Side Street green, Main Street red
-- `Phase D`: Side Street yellow, Main Street red
-
-The top-level controller mode switches between a normal cycle and flash mode.
-
-### Requirements And Use Cases
-
-The example includes illustrative requirements for conflict avoidance, clearance time, fail-safe behavior, phase sequence, supported modes, and visibility. It also includes lightweight use cases such as normal operation, switching to flash, returning to normal, actuated green, and pedestrian crossing.

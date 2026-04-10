@@ -206,7 +206,7 @@ package TrafficLightIntersection {
 		objective { doc /* Adequate walk and clearance time. */ }
 	}
 
-	// ========== Optional: actions for lamp commands (placeholder) ==========
+	// ========== Optional: illustrative actions for lamp commands ==========
 	action def SetMainGreen {
 		doc /* Command Main Street to green. */
 	}

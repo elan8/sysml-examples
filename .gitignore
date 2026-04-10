@@ -3,3 +3,7 @@ vscode/node_modules/
 vscode/.vscode-test/
 temp
 kerml-parser/test-logs/
+debug.log
+*.log
+.DS_Store
+Thumbs.db

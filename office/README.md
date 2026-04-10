@@ -2,6 +2,10 @@
 
 This is the smallest example in the repository. It is designed as a quick first read for learners who want to see a compact SysML v2 text model with typed ports, simple structural connections, a small state machine, and basic `satisfy` relationships.
 
+## Purpose
+
+Model a realistic office workstation used for engineering and analysis tasks: laptop, monitor, keyboard, mouse, and wall power.
+
 ## What This Example Demonstrates
 
 - typed interfaces and explicit structural connections
@@ -27,50 +31,12 @@ This is the smallest example in the repository. It is designed as a quick first 
 - this example optimizes for readability over strict realism
 - it is intentionally smaller and less formal than the timer, intersection, and drone examples
 
+## Validation And Tooling Notes
+
+- expected use: a quick orientation example in any SysML v2-capable editor
+- validation stance: reviewed for readability and teaching coherence rather than full formalization
+- if your tool uses a narrower supported subset, adapt the example conventions to that tool rather than treating this model as normative
+
 ## File
 
 - [office.sysml](office.sysml) - complete SysML v2 model for this example
-
-## Detailed Description
-
-### Purpose
-
-Model a realistic office workstation used for engineering and analysis tasks: laptop, monitor, keyboard, mouse, and wall power.
-
-### Scope
-
-- In scope: wiring and connectivity at system level, session behavior, and high-level performance and availability requirements.
-- Out of scope: network architecture, OS and software deployment details, thermal behavior, and enclosure ergonomics.
-
-### Model Contents
-
-The top-level system is `OfficeDeskSetup` with:
-
-- `wallSocket : WallSocket`
-- `laptop : Laptop`
-- `monitor : Monitor`
-- `mouse : Mouse`
-- `keyboard : Keyboard`
-
-Main connections:
-
-- `laptop.hdmi -> monitor.hdmi`
-- `laptop.power -> wallSocket.power`
-- `monitor.power -> wallSocket.power`
-- `laptop.usb1 -> mouse.usb`
-- `laptop.usb2 -> keyboard.usb`
-
-`Laptop` exhibits `WorkSessionStateMachine` with three states:
-
-- `PoweredOff`
-- `ActiveSession`
-- `IdleLocked`
-
-The model includes requirement definitions for:
-
-- laptop capability (`ProductivityComputerReq`)
-- external display support (`ExternalDisplayReq`)
-- input-device availability (`InputDeviceReq`)
-- continuous power (`ContinuousPowerReq`)
-
-Compared with the other examples, this one is intentionally minimal and serves as a quick orientation point before moving on to the richer timer example.

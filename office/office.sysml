@@ -16,24 +16,12 @@ package Office {
 		out powerAvailable : Boolean;
 	}
 
-	port def ACPoweredDevicePort {
-		in powerAvailable : Boolean;
-	}
-
 	port def HdmiPort {
 		out videoSignal : String;
 	}
 
-	port def HdmiSinkPort {
-		in videoSignal : String;
-	}
-
 	port def UsbHostPort {
 		out usbData : String;
-	}
-
-	port def UsbPeripheralPort {
-		in usbData : String;
 	}
 
 	// ========== Part definitions ==========

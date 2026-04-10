@@ -12,7 +12,6 @@ package SurveillanceDrone {
 	private import ISQBase::MassValue;
 	private import ISQBase::LengthValue;
 	private import ISQBase::DurationValue;
-	private import ISQSpaceTime::SpeedValue;
 
 	// ========== Port definitions (interfaces) ==========
 	port def MotorCommandPort {
@@ -55,7 +54,7 @@ package SurveillanceDrone {
 		in modeChanges : String;
 	}
 
-	// ========== Part definitions - Subsystems ==========
+	// ========== Part definitions - subsystems ==========
 	part def Airframe {
 		doc /* Structural support, attachment points, quad-X or H layout. */
 		attribute wheelbase : Real;
@@ -93,6 +92,7 @@ package SurveillanceDrone {
 		port rcIn : ~RCCommandPort;
 		port sensorIn : ~SensorDataPort;
 		port pwr : ~PowerPort;
+		exhibit state flightMode : FlightModeStateMachine;
 	}
 
 	part def IMU {
@@ -172,7 +172,7 @@ package SurveillanceDrone {
 	}
 
 	part def Power {
-		doc /* Battery + PDB; supplies all onboard systems. */
+		doc /* Battery + distribution; supplies all onboard systems. */
 		part battery : Battery;
 		part distribution : PowerDistribution;
 		attribute flightTimeNominal : DurationValue;
@@ -180,9 +180,7 @@ package SurveillanceDrone {
 
 	// ========== Top-level system ==========
 	part def SurveillanceQuadrotorDrone {
-		doc /*
-		 * Surveillance quadrotor UAV with gimbal-mounted cameras.
-		 */
+		doc /* Surveillance quadrotor UAV with gimbal-mounted cameras. */
 		part airframe : Airframe;
 		part propulsion : Propulsion;
 		part flightControl : FlightControlAndSensing;
@@ -191,7 +189,6 @@ package SurveillanceDrone {
 		part communication : Communication;
 		part power : Power;
 
-		// Connections summarized in the README interfaces section
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit1.cmd;
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit2.cmd;
 		connect flightControl.flightController.motorCmd to propulsion.propulsionUnit3.cmd;
@@ -202,7 +199,6 @@ package SurveillanceDrone {
 		connect flightControl.flightController.telemetryOut to communication.telemetryIn;
 		connect communication.c2In to flightControl.flightController.rcIn;
 		connect power.battery.pwrOut to power.distribution.mainPower;
-		// Avionics and payload: 5 V rail
 		connect power.distribution.regulated5V to flightControl.flightController.pwr;
 		connect power.distribution.regulated5V to flightControl.imu.pwr;
 		connect power.distribution.regulated5V to flightControl.barometer.pwr;
@@ -210,7 +206,6 @@ package SurveillanceDrone {
 		connect power.distribution.regulated5V to gimbal.pwr;
 		connect power.distribution.regulated5V to cameraPayload.pwr;
 		connect power.distribution.regulated5V to communication.pwr;
-		// Propulsion ESCs: battery nominal / 12 V rail (simplified)
 		connect power.distribution.regulated12V to propulsion.propulsionUnit1.pwr;
 		connect power.distribution.regulated12V to propulsion.propulsionUnit2.pwr;
 		connect power.distribution.regulated12V to propulsion.propulsionUnit3.pwr;
@@ -237,19 +232,19 @@ package SurveillanceDrone {
 	}
 
 	requirement def VideoLatencyReq {
-		subject drone : SurveillanceQuadrotorDrone;
+		subject communication : Communication;
 		doc /* Video end-to-end latency < 300 ms. */
 		require constraint { doc /* videoLatency < 300 ms. */ }
 	}
 
 	requirement def FailsafeReq {
-		subject drone : SurveillanceQuadrotorDrone;
+		subject controller : FlightController;
 		doc /* RTL or land on C2 loss, low battery, critical sensor failure. */
 		require constraint { doc /* On C2 loss or low battery or critical sensor failure: execute RTL or land. */ }
 	}
 
 	requirement def GeofencingReq {
-		subject drone : SurveillanceQuadrotorDrone;
+		subject flightControl : FlightControlAndSensing;
 		doc /* Respect no-fly zones and altitude limits. */
 		require constraint { doc /* Respect geofence and altitude limits. */ }
 	}
@@ -267,7 +262,7 @@ package SurveillanceDrone {
 	}
 
 	requirement def ControlModesReq {
-		subject drone : SurveillanceQuadrotorDrone;
+		subject controller : FlightController;
 		doc /* Manual, attitude, GPS hold, waypoint, orbit, RTL, optionally follow. */
 		require constraint { doc /* Support manual, attitude, GPS hold, waypoint, orbit, RTL, follow. */ }
 	}
@@ -278,17 +273,16 @@ package SurveillanceDrone {
 		require constraint { doc /* Operate in -10 degC to +45 degC. */ }
 	}
 
-	// Satisfy requirements by the drone (usage in context)
 	part droneInstance : SurveillanceQuadrotorDrone;
 	satisfy EnduranceReq by droneInstance;
 	satisfy MaxAltitudeAGLReq by droneInstance;
 	satisfy WindToleranceReq by droneInstance;
-	satisfy VideoLatencyReq by droneInstance;
-	satisfy FailsafeReq by droneInstance;
-	satisfy GeofencingReq by droneInstance;
+	satisfy VideoLatencyReq by droneInstance.communication;
+	satisfy FailsafeReq by droneInstance.flightControl.flightController;
+	satisfy GeofencingReq by droneInstance.flightControl;
 	satisfy RemoteIDReq by droneInstance;
 	satisfy GimbalPanTiltReq by droneInstance.gimbal;
-	satisfy ControlModesReq by droneInstance;
+	satisfy ControlModesReq by droneInstance.flightControl.flightController;
 	satisfy OperatingTempReq by droneInstance;
 
 	// ========== Use cases ==========
@@ -336,40 +330,11 @@ package SurveillanceDrone {
 		objective { doc /* Return to launch point and land safely. */ }
 	}
 
-	// ========== Behavior - Actions ==========
+	// ========== Behavior - mission actions ==========
 	action def ExecutePatrol {
 		in route : String;
 		out status : String;
-		doc /* Execute patrol/overwatch mission along route. */
-
-		action validateRoute {
-			in route : String = ExecutePatrol::route;
-			out validationStatus : String;
-		};
-
-		action startMission {
-			in route : String = ExecutePatrol::route;
-			out missionStarted : String;
-		};
-
-		action flyRoute {
-			in route : String = ExecutePatrol::route;
-			out progressStatus : String;
-		};
-
-		action capture : CaptureVideo { out videoStream; };
-
-		action finishMission {
-			in progressStatus : String = flyRoute::progressStatus;
-			out missionStatus : String;
-		};
-
-		first validateRoute then startMission;
-		first startMission then flyRoute;
-		first flyRoute then capture;
-		first capture then finishMission;
-
-		bind status = finishMission::missionStatus;
+		doc /* High-level patrol mission action for route-based surveillance. */
 	}
 
 	action def ExecuteOrbit {
@@ -377,107 +342,54 @@ package SurveillanceDrone {
 		in radius : Real;
 		in altitude : Real;
 		out status : String;
-		doc /* Orbit around point of interest. */
-
-		action validateOrbitParams {
-			in center : String = ExecuteOrbit::center;
-			in radius : Real = ExecuteOrbit::radius;
-			in altitude : Real = ExecuteOrbit::altitude;
-			out validationStatus : String;
-		};
-
-		action goToCenter {
-			in center : String = ExecuteOrbit::center;
-			out arrivedStatus : String;
-		};
-
-		action engageOrbit {
-			in center : String = ExecuteOrbit::center;
-			in radius : Real = ExecuteOrbit::radius;
-			in altitude : Real = ExecuteOrbit::altitude;
-			out orbitStatus : String;
-		};
-
-		action capture : CaptureVideo { out videoStream; };
-
-		first validateOrbitParams then goToCenter;
-		first goToCenter then engageOrbit;
-		first engageOrbit then capture;
-
-		bind status = engageOrbit::orbitStatus;
+		doc /* High-level orbit mission action around a point of interest. */
 	}
 
 	action def ControlGimbal {
 		in panAngle : Real;
 		in tiltAngle : Real;
 		in mode : String;
-		doc /* Command gimbal pointing and mode. */
-
-		action sanitizeCommand {
-			in panAngle : Real = ControlGimbal::panAngle;
-			in tiltAngle : Real = ControlGimbal::tiltAngle;
-			in mode : String = ControlGimbal::mode;
-			out sanitizedPan : Real;
-			out sanitizedTilt : Real;
-			out sanitizedMode : String;
-		}
-
-		action sendCommand {
-			in panAngle : Real = sanitizeCommand::sanitizedPan;
-			in tiltAngle : Real = sanitizeCommand::sanitizedTilt;
-			in mode : String = sanitizeCommand::sanitizedMode;
-		}
-
-		first sanitizeCommand then sendCommand;
+		doc /* High-level command for gimbal pointing and mode selection. */
 	}
 
 	action def CaptureVideo {
 		out videoStream : String;
-		doc /* Capture and output video stream. */
-
-		action startCapture {
-			out captureStatus : String;
-		}
-
-		action encodeStream {
-			in captureStatus : String = startCapture::captureStatus;
-			out encodedStream : String;
-		}
-
-		action publishStream {
-			in encodedStream : String = encodeStream::encodedStream;
-			out publishedStream : String;
-		}
-
-		first startCapture then encodeStream;
-		first encodeStream then publishStream;
-
-		bind videoStream = publishStream::publishedStream;
+		doc /* High-level action for producing a surveillance video stream. */
 	}
 
-	// Parts perform actions; allocations use named action usages (source/target must be usages per spec 7.15).
-	part def SurveillanceQuadrotorDroneWithBehavior :> SurveillanceQuadrotorDrone {
-		perform action executePatrol : ExecutePatrol;
-		perform action executeOrbit : ExecuteOrbit;
-		perform action controlGimbal : ControlGimbal;
-		perform action captureVideo : CaptureVideo;
-		allocate executePatrol to flightControl;
-		allocate executeOrbit to flightControl;
-		allocate controlGimbal to gimbal;
-		allocate captureVideo to cameraPayload;
+	// ========== State machine - flight modes ==========
+	state def Manual {
+		doc /* Direct pilot control with minimal stabilization assumptions. */
 	}
 
-	// ========== State machine - Flight modes ==========
-	state def Manual;
-	state def AttitudeHold;
-	state def GPSHold;
-	state def Waypoint;
-	state def Orbit;
-	state def Follow;
-	state def RTL;
-	state def Landing;
+	state def AttitudeHold {
+		doc /* Stabilized flight while pilot commands attitude and thrust. */
+	}
 
-	// Triggers for flight-mode transitions (operator commands + failsafes)
+	state def GPSHold {
+		doc /* Position-hold mode using GNSS and attitude stabilization. */
+	}
+
+	state def Waypoint {
+		doc /* Autonomous waypoint-following mission mode. */
+	}
+
+	state def Orbit {
+		doc /* Automated orbit around a point of interest. */
+	}
+
+	state def Follow {
+		doc /* Tracking mode for a moving subject or designated target. */
+	}
+
+	state def RTL {
+		doc /* Return-to-launch recovery mode. */
+	}
+
+	state def Landing {
+		doc /* Final descent and touchdown sequence. */
+	}
+
 	item def ManualSelected;
 	item def AttitudeHoldSelected;
 	item def GPSHoldSelected;
@@ -493,6 +405,7 @@ package SurveillanceDrone {
 	item def Recovered;
 
 	state def FlightModeStateMachine {
+		doc /* Flight-controller mode set with operator and failsafe transitions. */
 		state manual : Manual;
 		state attitudeHold : AttitudeHold;
 		state gpsHold : GPSHold;
@@ -505,7 +418,6 @@ package SurveillanceDrone {
 		entry;
 		then manual;
 
-		// --- Operator commanded mode changes ---
 		transition to_attitude_from_manual first manual accept AttitudeHoldSelected then attitudeHold;
 		transition to_gpshold_from_manual first manual accept GPSHoldSelected then gpsHold;
 		transition to_waypoint_from_manual first manual accept WaypointSelected then waypoint;
@@ -554,7 +466,6 @@ package SurveillanceDrone {
 		transition to_rtl_from_follow first follow accept RTLCommanded then rtl;
 		transition to_landing_from_follow first follow accept LandingCommanded then landing;
 
-		// --- Failsafe transitions to RTL (matching the README summary) ---
 		transition failsafe_rtl_c2loss first manual accept C2LinkLost then rtl;
 		transition failsafe_rtl_c2loss_ah first attitudeHold accept C2LinkLost then rtl;
 		transition failsafe_rtl_c2loss_gps first gpsHold accept C2LinkLost then rtl;
@@ -576,7 +487,6 @@ package SurveillanceDrone {
 		transition failsafe_rtl_sensor_orbit first orbit accept CriticalSensorFailure then rtl;
 		transition failsafe_rtl_sensor_follow first follow accept CriticalSensorFailure then rtl;
 
-		// --- RTL/Landing handling ---
 		transition rtl_to_landing first rtl accept LandingCommanded then landing;
 		transition rtl_recover_to_gpshold first rtl accept Recovered then gpsHold;
 		transition landing_to_manual_disarm first landing accept DisarmCommanded then manual;
@@ -598,5 +508,4 @@ package SurveillanceDrone {
 		return flightTime : Real;
 		capacity / currentDraw
 	}
-
 }
