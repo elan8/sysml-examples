@@ -7,10 +7,8 @@ package KitchenTimer {
 	doc /* Root package for a compact kitchen timer teaching example. */
 
 	// ========== Standard library imports ==========
-	private import ScalarValues::Real;
-	private import ScalarValues::String;
-	private import ScalarValues::Boolean;
-	private import ISQBase::DurationValue;
+	private import ScalarValues::*;
+	private import ISQ::DurationValue;
 	private import SI::V;
 	private import SI::A;
 	private import ISQElectromagnetism::electricPower;
@@ -166,52 +164,52 @@ package KitchenTimer {
 	}
 
 	requirement def TimerRangeReq {
-		subject timer : KitchenTimer;
-		doc /* Support 1-99 minutes (or 0:01-99:59). */
-		require constraint { doc /* minValue and maxValue define 1-99 min range. */ }
+		subject mcu : Microcontroller;
+		doc /* The controller shall support a configurable countdown range from 0:01 to 99:59. */
+		require constraint { doc /* The configured countdown value stays within the supported timer range. */ }
 	}
 
 	requirement def DisplayFormatReq {
-		subject timer : KitchenTimer;
-		doc /* Display remaining time in MM:SS format. */
-		require constraint { doc /* Display format is MM:SS. */ }
+		subject display : Display;
+		doc /* The display shall present the countdown value in MM:SS format. */
+		require constraint { doc /* The visible timer presentation uses a two-field minutes-and-seconds display. */ }
 	}
 
 	requirement def AccuracyReq {
 		subject mcu : Microcontroller;
-		doc /* +/-1 second per minute of elapsed time. */
-		require constraint { doc /* Tick rate and accumulation meet accuracy. */ }
+		doc /* The controller shall keep elapsed-time error within +/-1 second per minute. */
+		require constraint { doc /* Tick handling and countdown accumulation stay within the stated timing tolerance. */ }
 	}
 
 	requirement def BuzzerAudibilityReq {
-		subject timer : KitchenTimer;
-		doc /* Alarm shall be audible in typical kitchen environment. */
-		require constraint { doc /* Buzzer output meets audibility. */ }
+		subject buzzer : Buzzer;
+		doc /* The buzzer shall provide an audible alarm for a typical kitchen environment. */
+		require constraint { doc /* The buzzer output is intended to be noticeable when the timer expires. */ }
 	}
 
 	requirement def ButtonResponsivenessReq {
 		subject mcu : Microcontroller;
-		doc /* Button presses acknowledged within 100 ms. */
-		require constraint { doc /* Response time <= 100 ms. */ }
+		doc /* The controller shall acknowledge button events within 100 ms. */
+		require constraint { doc /* Input handling keeps button-to-response latency at or below 100 ms. */ }
 	}
 
 	requirement def StateConsistencyReq {
 		subject mcu : Microcontroller;
-		doc /* No conflicting states (e.g., running and expired). */
-		require constraint { doc /* State machine mutually exclusive states. */ }
+		doc /* The controller state machine shall remain in one mutually exclusive timer mode at a time. */
+		require constraint { doc /* Idle, Running, Paused, and Expired remain mutually exclusive controller states. */ }
 	}
 
 	requirement def BatteryRuntimeReq {
 		subject battery : Battery;
-		doc /* Minimum runtime (e.g., 100 hours typical use) on single charge. */
-		require constraint { doc /* runtimeEstimate >= 100 hours. */ }
+		doc /* The battery shall support a runtime estimate of at least 100 hours for typical use. */
+		require constraint { doc /* The modeled runtime estimate meets or exceeds the target usage duration. */ }
 	}
 
 	part timerInstance : KitchenTimer;
-	satisfy TimerRangeReq by timerInstance;
-	satisfy DisplayFormatReq by timerInstance;
+	satisfy TimerRangeReq by timerInstance.pcb.mcu;
+	satisfy DisplayFormatReq by timerInstance.pcb.display;
 	satisfy AccuracyReq by timerInstance.pcb.mcu;
-	satisfy BuzzerAudibilityReq by timerInstance;
+	satisfy BuzzerAudibilityReq by timerInstance.buzzer;
 	satisfy ButtonResponsivenessReq by timerInstance.pcb.mcu;
 	satisfy StateConsistencyReq by timerInstance.pcb.mcu;
 	satisfy BatteryRuntimeReq by timerInstance.battery;
@@ -254,26 +252,9 @@ package KitchenTimer {
 		objective { doc /* Start with preset duration. */ }
 	}
 
-	// ========== Optional: actions (placeholder) ==========
-	action def UpdateDisplay {
-		doc /* Command display to show current value. */
-	}
-
-	action def StartCountdown {
-		doc /* Begin countdown from set value. */
-	}
-
-	action def SoundAlarm {
-		doc /* Turn buzzer on. */
-	}
-
-	action def ClearDisplay {
-		doc /* Clear or reset display. */
-	}
-
-	// ========== Optional: parametrics ==========
+	// ========== Optional parametric examples ==========
 	constraint def TimerAccuracyConstraint {
-		doc /* Accuracy bounded by tick rate and elapsed time. */
+		doc /* Illustrative parametric support for AccuracyReq. */
 		in tickRate : DurationValue;
 		in elapsedTime : DurationValue;
 		in errorBound : Real;
@@ -281,7 +262,7 @@ package KitchenTimer {
 	}
 
 	constraint def BatteryRuntimeEstimate {
-		doc /* Runtime = f(capacity, load current). */
+		doc /* Illustrative parametric support for BatteryRuntimeReq. */
 		in capacity : Real;
 		in loadCurrent : Real;
 		in runtime : DurationValue;

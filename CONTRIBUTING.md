@@ -13,4 +13,5 @@ Small, focused improvements are the best fit for this repository.
 ## Validation
 
 - If you change a `.sysml` file, open it in a SysML v2-capable editor and confirm the package still loads in your chosen tool version.
+- For [timer/KitchenTimer.sysml](C:/Git/sysml-examples/timer/KitchenTimer.sysml), preserve the no-intended-diagnostics workflow in [`spec42`](https://github.com/elan8/spec42); this is the repository's flagship validated example.
 - If your tooling only supports a subset of the notation used here, document that in the PR or commit message.

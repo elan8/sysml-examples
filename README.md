@@ -14,9 +14,10 @@ Small SysML v2 text models used as teaching examples and learner-oriented refere
 - Audience: learners exploring SysML v2 text models and lightweight teaching examples.
 - Organization: one top-level package per example, with the narrative context in the example README and the model in the `.sysml` file.
 - Recommended reading order: [office/](office/) -> [timer/](timer/) -> [intersection/](intersection/) -> [drone/](drone/).
+- Best learner starting point after the `office` warm-up: [timer/](timer/), which is the strongest internally aligned example in the repository.
 - What to inspect:
   - `office`: typed ports, simple structure, small state machine, and `satisfy` traces.
-  - `timer`: a compact example combining structure, state behavior, interfaces, requirements, and use cases.
+  - `timer`: the flagship example; a compact model combining structure, state behavior, interfaces, requirements, and use cases.
   - `intersection`: controller-oriented state behavior and a phased operational model.
   - `drone`: a larger worked example showing broader system decomposition and richer behavioral sketches.
 
@@ -33,7 +34,9 @@ Small SysML v2 text models used as teaching examples and learner-oriented refere
 
 - The files in this repository have been reviewed for readability and packaging as teaching examples.
 - This repository does not yet include automated CI validation or conformance checking for the models.
-- To review the models yourself, open a `.sysml` file in a SysML v2-capable editor, such as tooling aligned with the [SysML v2 Release](https://github.com/Systems-Modeling/SysML-v2-Release), and confirm that the package loads and the syntax is accepted by your chosen tool version.
+- The [timer](timer/) example is the first example in this repository validated against [spec42](https://github.com/elan8/spec42), the SysML v2 language server and VS Code extension from Elan8.
+- For the canonical `timer` workflow, open [KitchenTimer.sysml](timer/KitchenTimer.sysml) in `spec42` and run validation/checks through the language server-backed editor workflow; the flagship example is expected to load without intended diagnostics.
+- To review the other models yourself, open a `.sysml` file in a SysML v2-capable editor and confirm that the package loads and the syntax is accepted by your chosen tool version.
 - If a tool reports differences, treat the examples as illustrative first and adapt them to the conventions and supported subset of that editor.
 
 ## Layout
