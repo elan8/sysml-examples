@@ -71,6 +71,14 @@ package Office {
 		connect monitor.power to wallSocket.power;
 	}
 
+	view structure : GeneralView{
+		expose OfficeDeskSetup;
+	}
+
+	view connections : InterconnectionView{
+		expose OfficeDeskSetup;
+	}
+
 	// ========== Behavior ==========
 	item def StartWork;
 	item def LockScreen;
