@@ -4,11 +4,6 @@ Short, readable SysML v2 text models for learning, teaching, and quick experimen
 
 ## What is in this repo?
 
-Each example folder contains:
-
-- one main `.sysml` model
-- one README explaining purpose, scope, and simplifications
-
 Current examples:
 
 - [office/](office/): smallest intro model for orientation
