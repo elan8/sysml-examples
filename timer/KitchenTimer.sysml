@@ -8,9 +8,9 @@ package KitchenTimer {
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::*;
-	private import ISQ::DurationValue;
-	private import SI::V;
-	private import SI::A;
+	private import ISQBase::DurationValue;
+	private import SI::volt;
+	private import SI::ampere;
 	private import ISQElectromagnetism::electricPower;
 
 	port def BatteryOutlet {
