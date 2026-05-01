@@ -2,7 +2,13 @@ package WebShopExample {
     import WebShopArchitecture::*;
     import WebShopRequirements::*;
     import WebShopBehavior::*;
-    import KubernetesDomain::*;
+    private import ScalarValues::String;
+
+    part def KubernetesCluster {
+        attribute clusterName : String;
+        attribute nodeName : String;
+        attribute host : String;
+    }
 
     part def CommerceCluster :> KubernetesCluster {
         attribute :>> clusterName = "commerce-prod";

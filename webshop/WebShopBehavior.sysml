@@ -1,4 +1,7 @@
 package WebShopBehavior {
+    private import ScalarValues::String;
+    private import ScalarValues::Boolean;
+
     state def Created;
     state def PaymentPending;
     state def Paid;

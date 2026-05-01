@@ -1,10 +1,55 @@
 package WebShopArchitecture {
-    import SoftwareCore::*;
-    import HttpDomain::*;
-    import SqlDomain::*;
-    import KafkaDomain::*;
-    import DistributedSystems::*;
-    private import SoftwareInteractions::*;
+    private import ScalarValues::String;
+
+    // Minimal, local definitions to keep this example portable across SysML v2 tools.
+    part def SoftwareModule {
+        attribute moduleName : String;
+    }
+
+    part def HttpService :> SoftwareModule {
+        attribute serviceName : String;
+    }
+
+    part def SqlDatabase {
+        attribute storeName : String;
+        attribute engineName : String;
+    }
+
+    part def KafkaTopic {
+        attribute channelName : String;
+        attribute retention : String;
+        attribute partitions : String;
+    }
+
+    part def ExternalSystem {
+        attribute systemName : String;
+    }
+
+    part def InteractionScenario;
+    part def Lifeline;
+
+    part def Message {
+        attribute label : String;
+        ref from : Lifeline;
+        ref to : Lifeline;
+    }
+
+    part def SynchronousCall :> Message;
+    part def ReturnMessage :> Message;
+    part def AsynchronousMessage :> Message;
+    part def CreationMessage :> Message;
+
+    part def Activation {
+        ref on : Lifeline;
+        ref startMessage : Message;
+        ref finishMessage : Message;
+    }
+
+    part def InteractionOperand {
+        attribute guard : String;
+    }
+
+    part def AltFragment;
 
     part def Storefront :> SoftwareModule {
         attribute :>> moduleName = "web-storefront";
