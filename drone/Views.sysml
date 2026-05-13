@@ -5,9 +5,6 @@ package Views{
         expose SurveillanceDrone::SurveillanceQuadrotorDrone;
     }
 
-    view grid: GridView {
-        expose SurveillanceDrone::SurveillanceQuadrotorDrone;
-    }
 
     view connections: InterconnectionView {
         expose SurveillanceDrone::SurveillanceQuadrotorDrone;
