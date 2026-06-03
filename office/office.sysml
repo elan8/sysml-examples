@@ -1,10 +1,10 @@
 /*
- * Office workstation - learner-focused SysML v2 worked example.
+ * Office workplace - learner-focused SysML v2 worked example.
  * Focus: small structure, typed interfaces, simple behavior,
  * and basic requirements traceability.
  */
 package Office {
-	doc /* Root package for a compact office workstation teaching example. */
+	doc /* Root package for a compact office workplace teaching example. */
 
 	// ========== Standard library imports ==========
 	private import ScalarValues::Real;
@@ -12,7 +12,7 @@ package Office {
 	private import ScalarValues::Boolean;
 
 	// ========== Port definitions ==========
-	port def ACOutletPort {
+	port def PowerOutletPort {
 		out powerAvailable : Boolean;
 	}
 
@@ -27,7 +27,11 @@ package Office {
 	// ========== Part definitions ==========
 	part def WallSocket {
 		doc /* Building mains outlet powering office equipment. */
-		port power : ACOutletPort;
+		port power : PowerOutletPort;
+	}
+
+	part def Desk{
+		doc /* Surface for placing workstation components. */
 	}
 
 	part def Laptop {
@@ -36,7 +40,7 @@ package Office {
 		attribute storageGb : Real;
 		attribute hasSsd : Boolean;
 		port hdmi : HdmiPort;
-		port power : ~ACOutletPort;
+		port power : ~PowerOutletPort;
 		port usb1 : UsbHostPort;
 		port usb2 : UsbHostPort;
 		exhibit state sessionState : WorkSessionStateMachine;
@@ -50,33 +54,42 @@ package Office {
 		port usb : ~UsbHostPort;
 	}
 
+
+
 	part def Monitor {
 		attribute diagonalInches : Real;
 		port hdmi : ~HdmiPort;
-		port power : ~ACOutletPort;
+		port power : ~PowerOutletPort;
 	}
 
-	part def OfficeDeskSetup {
+	part def Headset {
+		port usb : ~UsbHostPort;
+	}
+
+	part def OfficeWorkplace {
 		doc /* Laptop plus peripherals and wall power. */
+		part desk : Desk;
 		part wallSocket : WallSocket;
 		part laptop : Laptop;
 		part mouse : Mouse;
 		part keyboard : Keyboard;
 		part monitor : Monitor;
+	    part headSet : Headset;
 
 		connect laptop.hdmi to monitor.hdmi;
 		connect laptop.power to wallSocket.power;
 		connect laptop.usb1 to mouse.usb;
 		connect laptop.usb2 to keyboard.usb;
-		connect monitor.power to wallSocket.power;
+		//connect monitor.power to wallSocket.power;
+		//connect laptop.usb1 to headSet.usb;
 	}
 
 	view structure : GeneralView{
-		expose OfficeDeskSetup;
+		expose OfficeWorkplace;
 	}
 
 	view connections : InterconnectionView{
-		expose OfficeDeskSetup;
+		expose OfficeWorkplace;
 	}
 
 	// ========== Behavior ==========
@@ -118,24 +131,24 @@ package Office {
 	}
 
 	requirement def ExternalDisplayReq {
-		subject setup : OfficeDeskSetup;
+		subject setup : OfficeWorkplace;
 		doc /* Workstation shall support an external display connection. */
 		require constraint { doc /* laptop.hdmi connected to monitor.hdmi. */ }
 	}
 
 	requirement def InputDeviceReq {
-		subject setup : OfficeDeskSetup;
+		subject setup : OfficeWorkplace;
 		doc /* Workstation shall include keyboard and pointing device connectivity. */
 		require constraint { doc /* both USB host ports connected to peripherals. */ }
 	}
 
 	requirement def ContinuousPowerReq {
-		subject setup : OfficeDeskSetup;
+		subject setup : OfficeWorkplace;
 		doc /* Laptop and monitor shall receive mains power from wall socket. */
 		require constraint { doc /* laptop.power and monitor.power connected to wallSocket.power. */ }
 	}
 
-	part officeInstance : OfficeDeskSetup;
+	part officeInstance : OfficeWorkplace;
 	satisfy ProductivityComputerReq by officeInstance.laptop;
 	satisfy ExternalDisplayReq by officeInstance;
 	satisfy InputDeviceReq by officeInstance;
@@ -145,14 +158,14 @@ package Office {
 	item def OfficeUser;
 
 	use case def StartDeskWork {
-		subject setup : OfficeDeskSetup;
+		subject setup : OfficeWorkplace;
 		actor user : OfficeUser;
 		doc /* User powers on laptop and starts the work session. */
 		objective { doc /* Reach ActiveSession with all required peripherals connected. */ }
 	}
 
 	use case def LockAndResume {
-		subject setup : OfficeDeskSetup;
+		subject setup : OfficeWorkplace;
 		actor user : OfficeUser;
 		doc /* User locks workstation while away, then resumes later. */
 		objective { doc /* Protect session while maintaining desk setup readiness. */ }
