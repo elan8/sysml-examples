@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Check examples with Spec42
-        uses: elan8/spec42@v0.26.2
+        uses: elan8/spec42@v0.26.3
         with:
           path: .
           format: sarif
