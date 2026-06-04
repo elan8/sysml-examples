@@ -13,10 +13,10 @@ Model a signalized intersection with a compact controller, signal heads, detecto
 From the repository root:
 
 ```bash
-spec42 check examples/intersection/TrafficLightIntersection.sysml
+spec42 check intersection/
 ```
 
-In VS Code, open the model and use the state-transition view to inspect the controller phases.
+In VS Code, open `TrafficLightIntersection.sysml` and `Views.sysml`; use `controllerStateMachine` in the Model Visualizer for the phase and mode diagram.
 
 ## What This Example Demonstrates
 
@@ -24,6 +24,13 @@ In VS Code, open the model and use the state-transition view to inspect the cont
 - a clear relationship between controller logic, signal heads, detectors, and operator input
 - simple requirements and use cases attached to an operational scenario
 - a compact example of mode-oriented behavior using `Normal` and `Flash`
+- separate views for structure (`GeneralView`) and behavior (`StateTransitionView`)
+
+The corresponding views in `Views.sysml` are:
+
+- `structure` (`GeneralView`) — `intersectionInstance` with part/port filter (no state machines)
+- `connections` (`InterconnectionView`) — signal and detector wiring
+- `controllerStateMachine` (`StateTransitionView`) — `ControllerStateMachine` behavior definition
 
 ## What Is Intentionally Simplified
 
@@ -33,10 +40,10 @@ In VS Code, open the model and use the state-transition view to inspect the cont
 
 ## What To Inspect In The Model
 
-- `TrafficLightIntersection` for the top-level structure
-- `Normal` and `ControllerStateMachine` for the key behavior
+- `TrafficLightIntersection` (in `TrafficLightIntersectionStructure.sysml`) for the top-level structure
+- `Normal` and `ControllerStateMachine` in `TrafficLightIntersectionBehavior.sysml`
 - the signal, detector, and operator ports for simple interface patterns
-- the requirement definitions and `satisfy` usages
+- the requirement definitions and `satisfy` usages in `TrafficLightIntersection.sysml`
 
 ## Known Limitations
 
@@ -46,9 +53,27 @@ In VS Code, open the model and use the state-transition view to inspect the cont
 ## Validation And Tooling Notes
 
 - expected use: a behavior-focused example to inspect in a SysML v2-capable editor
-- validation stance: syntax and package loadability should be reviewed in your chosen tool, but this is not claimed as a fully validated traffic-control reference
+- validation stance: `spec42 check intersection/` should load cleanly with no intended diagnostics
 - if a tool reports differences in state or requirement notation, treat the model as an illustrative pattern rather than a standards-complete deployment model
 
-## File
+## Files
 
-- [TrafficLightIntersection.sysml](TrafficLightIntersection.sysml) - complete SysML v2 model for this example
+| File | Purpose |
+|------|---------|
+| [TrafficLightIntersection.sysml](TrafficLightIntersection.sysml) | Instance, `satisfy` — start here |
+| [TrafficLightIntersectionPorts.sysml](TrafficLightIntersectionPorts.sysml) | Lamp, detector, and operator interfaces |
+| [TrafficLightIntersectionStructure.sysml](TrafficLightIntersectionStructure.sysml) | Parts and connections |
+| [TrafficLightIntersectionBehavior.sysml](TrafficLightIntersectionBehavior.sysml) | Phases, controller state machine, lamp actions |
+| [TrafficLightIntersectionRequirements.sysml](TrafficLightIntersectionRequirements.sysml) | Requirements, use cases, clearance constraint |
+| [Views.sysml](Views.sysml) | Structure, interconnection, state-transition views |
+
+## Walkthrough
+
+Read the model in this order:
+
+1. `TrafficLightIntersection.sysml` — `intersectionInstance` and `satisfy` relations
+2. `TrafficLightIntersectionPorts.sysml` — typed interfaces
+3. `TrafficLightIntersectionStructure.sysml` — intersection decomposition and wiring
+4. `TrafficLightIntersectionBehavior.sysml` — `ControllerStateMachine` and phase cycle
+5. `TrafficLightIntersectionRequirements.sysml` — requirements and use cases
+6. `Views.sysml` — `structure`, `connections`, and `controllerStateMachine`

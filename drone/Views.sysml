@@ -1,12 +1,21 @@
-package Views{
-    import SurveillanceDrone;
+package Views {
+	import SurveillanceDrone::*;
+	import SurveillanceDroneBehavior::*;
 
-    view structure: GeneralView {
-        expose SurveillanceDrone::SurveillanceQuadrotorDrone;
-    }
+	view structure : GeneralView {
+		doc /* Structure only: parts and ports on droneInstance. */
+		expose SurveillanceDrone::droneInstance;
+		filter @SysML::PartUsage or @SysML::PartDefinition
+			or @SysML::PortUsage or @SysML::PortDefinition;
+	}
 
+	view connections : InterconnectionView {
+		expose SurveillanceDrone::droneInstance;
+	}
 
-    view connections: InterconnectionView {
-        expose SurveillanceDrone::SurveillanceQuadrotorDrone;
-    }
+	view flightModeStateMachine : StateTransitionView {
+		doc /* Flight modes, operator selection, and failsafe transitions. */
+		expose SurveillanceDroneBehavior::FlightModeStateMachine;
+	}
+
 }

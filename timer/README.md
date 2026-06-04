@@ -13,10 +13,10 @@ Model a countdown timer for cooking, workouts, and other timed tasks with a clea
 From the repository root:
 
 ```bash
-spec42 check examples/timer/KitchenTimer.sysml
+spec42 check timer/
 ```
 
-In VS Code, open `KitchenTimer.sysml`, then use the Model Explorer for structure and the Model Visualizer for the state-transition and action-flow views.
+In VS Code, open `KitchenTimer.sysml` and `Views.sysml`, then use the Model Explorer for structure and the Model Visualizer for structure, interconnection, and state-transition views.
 
 ## Why Start Here
 
@@ -31,6 +31,13 @@ In VS Code, open `KitchenTimer.sysml`, then use the Model Explorer for structure
 - a small decomposition from logical timer behavior into implementation-oriented parts
 - requirements and `satisfy` traces in a compact setting
 - simple use cases that connect the model back to user intent
+- separate views for structure (`GeneralView`) and behavior (`StateTransitionView`), with `filter` on the structure view so exhibited state does not appear there
+
+The corresponding views in `Views.sysml` are:
+
+- `structure` (`GeneralView`) — `timerInstance` with `filter` on part/port definitions and usages (no states)
+- `connections` (`InterconnectionView`) — `timerInstance` power and signal wiring
+- `timerStateMachine` (`StateTransitionView`) — `TimerStateMachine` behavior definition
 
 ## What Is Intentionally Simplified
 
@@ -40,35 +47,46 @@ In VS Code, open `KitchenTimer.sysml`, then use the Model Explorer for structure
 
 ## What To Inspect In The Model
 
-- `KitchenTimer` for the top-level system structure
+- `KitchenTimer` (in `KitchenTimerStructure.sysml`) for the top-level system structure
 - `TimerStateMachine` for the main behavioral flow
 - the port definitions for button, display, buzzer, and battery interactions
-- the requirement definitions and `satisfy` usages
+- the requirement definitions and `satisfy` usages in `KitchenTimer.sysml`
 - the `TimerPCB` decomposition as a bridge between logical and implementation-oriented views
+
+**Two display ports:** `DisplayCommandPort` is the logical value (MM:SS string) from firmware; `LcdSegmentDrivePort` is the physical COM/SEG drive to the glass. Both are intentional.
 
 ## Known Limitations
 
 - this is a teaching example, not a validated appliance design
 - the requirements remain lightweight and readable rather than fully verification-ready
 - the parametric constraints are illustrative support for the timing and runtime requirements, not a full analysis model
+- countdown timing and `CountdownComplete` are modeled as states and events only; there is no explicit countdown action or tick binding to the state machine
 
 ## Validation And Tooling Notes
 
 - canonical validation target: [`spec42`](https://github.com/elan8/spec42)
 - this is the repository's flagship validated example
-- current goal: the file should load cleanly and publish no intended diagnostics in the `spec42` workflow
+- current goal: the model should load cleanly and publish no intended diagnostics in the `spec42` workflow
 - if you adapt the model to another SysML v2 tool, keep the teaching story and end-to-end coherence intact even if notation adjustments are required
 
-## File
+## Files
 
-- [KitchenTimer.sysml](KitchenTimer.sysml) - complete SysML v2 model for this example
+| File | Purpose |
+|------|---------|
+| [KitchenTimer.sysml](KitchenTimer.sysml) | Instance, `satisfy` — start here |
+| [KitchenTimerPorts.sysml](KitchenTimerPorts.sysml) | Typed interfaces (buttons, display, power) |
+| [KitchenTimerStructure.sysml](KitchenTimerStructure.sysml) | Parts, PCB, connections |
+| [KitchenTimerBehavior.sysml](KitchenTimerBehavior.sysml) | States, events, `TimerStateMachine` |
+| [KitchenTimerRequirements.sysml](KitchenTimerRequirements.sysml) | Requirements, use cases, illustrative constraints |
+| [Views.sysml](Views.sysml) | Structure, interconnection, state-transition views |
 
 ## Walkthrough
 
 Read the model in this order:
 
-1. Start at `KitchenTimer` to understand the top-level parts and power fan-out.
-2. Inspect the port definitions to see how button input, display output, buzzer control, and battery power are typed.
-3. Read `TimerPCB` to see how the logical timer behavior is mapped onto a small implementation-oriented decomposition.
-4. Read `TimerStateMachine` to understand the core learner-facing behavior: set, run, pause, expire, and reset.
-5. Finish with the requirement definitions, `satisfy` relations, and the two illustrative constraints that support the timing and runtime story.
+1. `KitchenTimer.sysml` — `timerInstance` and `satisfy` relations
+2. `KitchenTimerPorts.sysml` — typed interfaces
+3. `KitchenTimerStructure.sysml` — `KitchenTimer`, `TimerPCB`, and power fan-out
+4. `KitchenTimerBehavior.sysml` — `TimerStateMachine`
+5. `KitchenTimerRequirements.sysml` — requirements and use cases
+6. `Views.sysml` — `structure` for parts and ports only; `connections` for wiring; `timerStateMachine` for the state diagram
