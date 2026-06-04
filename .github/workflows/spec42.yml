@@ -1,0 +1,40 @@
+name: Spec42
+
+on:
+  pull_request:
+    paths:
+      - "**/*.sysml"
+      - "**/*.kerml"
+      - "**/README.md"
+      - "CONTRIBUTING.md"
+      - ".github/workflows/spec42.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.sysml"
+      - "**/*.kerml"
+      - "**/README.md"
+      - "CONTRIBUTING.md"
+      - ".github/workflows/spec42.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  check:
+    name: Check SysML examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check examples with Spec42
+        uses: elan8/spec42@v0.26.1
+        with:
+          path: .
+          format: sarif
+          warnings-as-errors: true
