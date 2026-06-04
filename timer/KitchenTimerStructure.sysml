@@ -4,10 +4,13 @@ package KitchenTimerStructure {
 
 	private import ScalarValues::*;
 	private import ISQBase::DurationValue;
+	private import ISQElectromagnetism::ElectricChargeValue;
+	private import ISQElectromagnetism::ElectricPotentialDifferenceValue;
+	private import ISQSpaceTime::FrequencyValue;
 
 	part def Microcontroller {
 		doc /* MCU on PCB with built-in LCD controller; runs timer firmware; COM/SEG to display glass, GPIO to buttons. */
-		attribute clockFrequency : Real;
+		attribute clockFrequency : FrequencyValue;
 		attribute flashSize : Real;
 		attribute ramSize : Real;
 		port buttonIn : ~ButtonInputPort;
@@ -59,8 +62,8 @@ package KitchenTimerStructure {
 
 	part def Battery {
 		doc /* Power supply for all subsystems; e.g. 3xAAA. */
-		attribute capacity : Real;
-		attribute voltage : Real;
+		attribute capacity : ElectricChargeValue;
+		attribute nominalVoltage : ElectricPotentialDifferenceValue;
 		attribute runtimeEstimate : DurationValue;
 		port powerOut : BatteryOutlet;
 	}

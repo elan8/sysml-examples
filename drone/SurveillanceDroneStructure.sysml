@@ -7,10 +7,17 @@ package SurveillanceDroneStructure {
 	private import ISQBase::MassValue;
 	private import ISQBase::LengthValue;
 	private import ISQBase::DurationValue;
+	private import ISQBase::ElectricCurrentValue;
+	private import ISQElectromagnetism::ElectricChargeValue;
+	private import ISQElectromagnetism::ElectricPotentialDifferenceValue;
+	private import ISQMechanics::ForceValue;
+	private import ISQSpaceTime::FrequencyValue;
+	private import ISQSpaceTime::AngularMeasureValue;
+	private import ISQSpaceTime::AngularVelocityValue;
 
 	part def Airframe {
 		doc /* Structural support, attachment points, quad-X or H layout. */
-		attribute wheelbase : Real;
+		attribute wheelbase : LengthValue;
 		attribute weight : MassValue;
 		attribute maxPayloadCapacity : MassValue;
 		attribute foldableArms : String;
@@ -19,11 +26,11 @@ package SurveillanceDroneStructure {
 
 	part def PropulsionUnit {
 		doc /* One motor + ESC + propeller; BLDC outrunner, PWM/DShot input. */
-		attribute thrust : Real;
+		attribute thrust : ForceValue;
 		attribute hoverThrottle : Real;
-		attribute maxCurrent : Real;
+		attribute maxCurrent : ElectricCurrentValue;
 		port cmd : MotorCommandPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 30 [A]; }
 	}
 
 	part def Propulsion {
@@ -32,36 +39,36 @@ package SurveillanceDroneStructure {
 		part propulsionUnit2 : PropulsionUnit;
 		part propulsionUnit3 : PropulsionUnit;
 		part propulsionUnit4 : PropulsionUnit;
-		attribute thrustTotal : Real;
+		attribute thrustTotal : ForceValue;
 	}
 
 	part def FlightController {
 		doc /* Main processor: attitude/rate control, mixing, flight modes. */
-		attribute updateRate : Real;
+		attribute updateRate : FrequencyValue;
 		attribute supportedModes : String;
 		port motorCmd : ~MotorCommandPort;
 		port gimbalCmd : ~GimbalCommandPort;
 		port telemetryOut : TelemetryPort;
 		port rcIn : ~RCCommandPort;
 		port sensorIn : ~SensorDataPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.5 [A]; }
 		exhibit state flightMode : FlightModeStateMachine;
 	}
 
 	part def IMU {
-		attribute sampleRate : Real;
+		attribute sampleRate : FrequencyValue;
 		port dataOut : SensorDataPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.01 [A]; }
 	}
 
 	part def Barometer {
 		port altitudeOut : SensorDataPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.001 [A]; }
 	}
 
 	part def GNSSReceiver {
 		port positionOut : SensorDataPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.05 [A]; }
 	}
 
 	part def FlightControlAndSensing {
@@ -79,24 +86,27 @@ package SurveillanceDroneStructure {
 
 	part def Gimbal {
 		doc /* Mechanically stabilized platform; pan/tilt, optionally roll. */
-		attribute panRange : Real;
-		attribute tiltRange : Real;
-		attribute maxAngularRate : Real;
+		attribute panRange : AngularMeasureValue;
+		attribute tiltRange : AngularMeasureValue;
+		attribute maxAngularRate : AngularVelocityValue;
 		attribute payloadCapacity : MassValue;
 		port cmd : GimbalCommandPort;
 		port cameraCtrl : CameraControlPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.5 [A]; }
 	}
 
 	part def CameraPayload {
-		doc /* Visible and/or thermal camera; video and stills. */
+		doc /*
+		 * Visible and/or thermal camera; video and stills.
+		 * frameRate, fov, and zoomRange are dimensionless sketches, not optical quantities.
+		 */
 		attribute resolution : String;
 		attribute frameRate : Real;
 		attribute fov : Real;
 		attribute zoomRange : Real;
 		port videoOut : TelemetryPort;
 		port control : ~CameraControlPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.3 [A]; }
 	}
 
 	part def Communication {
@@ -107,13 +117,13 @@ package SurveillanceDroneStructure {
 		port c2In : RCCommandPort;
 		port telemetryIn : ~TelemetryPort;
 		port videoIn : ~TelemetryPort;
-		port pwr : ~PowerPort;
+		port pwr : ~PowerPort { :>> maxCurrent = 0.2 [A]; }
 	}
 
 	part def Battery {
-		attribute nominalVoltage : Real;
-		attribute capacity : Real;
-		attribute maxDischargeRate : Real;
+		attribute nominalVoltage : ElectricPotentialDifferenceValue;
+		attribute capacity : ElectricChargeValue;
+		attribute maxDischargeRate : ElectricCurrentValue;
 		attribute weight : MassValue;
 		port pwrOut : PowerPort;
 	}

@@ -24,6 +24,7 @@ In VS Code, open `TrafficLightIntersection.sysml` and `Views.sysml`; use `contro
 - a clear relationship between controller logic, signal heads, detectors, and operator input
 - simple requirements and use cases attached to an operational scenario
 - a compact example of mode-oriented behavior using `Normal` and `Flash`
+- ISQ quantity types for phase timing and clearance (`DurationValue`, `LengthValue`, `SpeedValue`)
 - separate views for structure (`GeneralView`) and behavior (`StateTransitionView`)
 
 The corresponding views in `Views.sysml` are:
@@ -37,6 +38,7 @@ The corresponding views in `Views.sysml` are:
 - the example uses a reduced intersection model rather than a full real-world traffic installation
 - pedestrian timing, detector behavior, all-red handling, and preemption are discussed more fully in the README than in the model
 - requirements and safety rules are illustrative and not a substitute for traffic-control standards
+- lamp indication and operator mode commands use `String` where a deployment model would use enums or structured signal aspects
 
 ## What To Inspect In The Model
 

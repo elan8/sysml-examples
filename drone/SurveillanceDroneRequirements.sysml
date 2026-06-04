@@ -2,6 +2,11 @@ package SurveillanceDroneRequirements {
 	import SurveillanceDroneStructure::*;
 
 	private import ScalarValues::Real;
+	private import ISQBase::DurationValue;
+	private import ISQBase::MassValue;
+	private import ISQBase::ElectricCurrentValue;
+	private import ISQElectromagnetism::ElectricChargeValue;
+	private import ISQMechanics::ForceValue;
 
 	requirement def EnduranceReq {
 		subject drone : SurveillanceQuadrotorDrone;
@@ -108,18 +113,18 @@ package SurveillanceDroneRequirements {
 	}
 
 	constraint def TotalThrustMargin {
-		doc /* Total thrust >= weight with margin for hover and maneuver. */
-		in totalThrust : Real;
-		in totalWeight : Real;
+		doc /* Illustrative: thrust (force) vs weight force with dimensionless margin. */
+		in totalThrust : ForceValue;
+		in weightForce : ForceValue;
 		in margin : Real;
-		totalThrust >= totalWeight * margin
+		totalThrust >= weightForce * margin
 	}
 
 	calc def FlightTimeEstimate {
-		doc /* Flight time from capacity and current draw. */
-		in capacity : Real;
-		in currentDraw : Real;
-		return flightTime : Real;
+		doc /* Flight time from charge and current draw. */
+		in capacity : ElectricChargeValue;
+		in currentDraw : ElectricCurrentValue;
+		return flightTime : DurationValue;
 		capacity / currentDraw
 	}
 

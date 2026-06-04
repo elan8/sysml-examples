@@ -3,6 +3,8 @@ package KitchenTimerRequirements {
 
 	private import ScalarValues::*;
 	private import ISQBase::DurationValue;
+	private import ISQBase::ElectricCurrentValue;
+	private import ISQElectromagnetism::ElectricChargeValue;
 
 	requirement def TimerRangeReq {
 		subject mcu : Microcontroller;
@@ -92,9 +94,9 @@ package KitchenTimerRequirements {
 	}
 
 	constraint def BatteryRuntimeEstimate {
-		doc /* Illustrative parametric support for BatteryRuntimeReq. */
-		in capacity : Real;
-		in loadCurrent : Real;
+		doc /* Illustrative parametric support for BatteryRuntimeReq; charge / current gives duration. */
+		in capacity : ElectricChargeValue;
+		in loadCurrent : ElectricCurrentValue;
 		in runtime : DurationValue;
 		runtime >= capacity / loadCurrent
 	}

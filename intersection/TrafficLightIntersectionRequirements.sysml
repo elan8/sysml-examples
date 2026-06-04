@@ -1,8 +1,9 @@
 package TrafficLightIntersectionRequirements {
 	import TrafficLightIntersectionStructure::*;
 
-	private import ScalarValues::Real;
 	private import ISQBase::DurationValue;
+	private import ISQBase::LengthValue;
+	private import ISQSpaceTime::SpeedValue;
 
 	requirement def NoConflictingGreensReq {
 		subject intersection : TrafficLightIntersection;
@@ -80,8 +81,8 @@ package TrafficLightIntersectionRequirements {
 
 	constraint def ClearanceTimeConstraint {
 		doc /* Yellow time >= f(speed, distance) for clearance. */
-		in approachSpeed : Real;
-		in clearanceDistance : Real;
+		in approachSpeed : SpeedValue;
+		in clearanceDistance : LengthValue;
 		in yellowTime : DurationValue;
 		yellowTime >= clearanceDistance / approachSpeed
 	}

@@ -32,6 +32,7 @@ In VS Code, open `KitchenTimer.sysml` and `Views.sysml`, then use the Model Expl
 - requirements and `satisfy` traces in a compact setting
 - simple use cases that connect the model back to user intent
 - separate views for structure (`GeneralView`) and behavior (`StateTransitionView`), with `filter` on the structure view so exhibited state does not appear there
+- ISQ/SI quantity types for time, charge, voltage, frequency, and electric power (reference pattern for this repository)
 
 The corresponding views in `Views.sysml` are:
 
@@ -42,6 +43,7 @@ The corresponding views in `Views.sysml` are:
 ## What Is Intentionally Simplified
 
 - countdown logic, timing accuracy, and electrical behavior are sketched at example level rather than fully formalized
+- display and segment-drive ports use `String` where a product model would use structured display items; `flashSize` and `ramSize` stay dimensionless `Real` (byte-count sketch)
 - the requirements and constraints are illustrative and not intended as a complete product specification
 - physical implementation details are selective and only included where they help explain structure or interfaces
 

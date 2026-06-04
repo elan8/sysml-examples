@@ -23,6 +23,7 @@ In VS Code, open `SurveillanceDrone.sysml` and `Views.sysml`; the Model Explorer
 - decomposition of a larger system into airframe, propulsion, flight control, gimbal, payload, communication, and power
 - a wider set of ports, requirements, use cases, mission actions, and flight-mode behavior than the smaller examples
 - a learner-friendly bridge from simple examples to a richer system-of-interest narrative
+- ISQ/SI quantity types for mass, length, time, force, power, charge, current, angles, and angular rate
 - separate views for structure (`GeneralView`) and behavior (`StateTransitionView`)
 
 The corresponding views in `Views.sysml` are:
@@ -35,6 +36,7 @@ The corresponding views in `Views.sysml` are:
 
 - many domain concepts are modeled at sketch level to keep the model readable across files
 - interfaces often use simple value types where a stricter model would introduce richer domain types
+- telemetry, C2, and camera command ports still use `String` where a product model would use structured messages or enums
 - the mission actions are intentionally lightweight and illustrative rather than a detailed executable workflow
 - the requirements are not intended to be a complete or authoritative drone architecture
 
