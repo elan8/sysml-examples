@@ -1,4 +1,5 @@
 package Views {
+	private import StandardViewDefinitions::*;
 	import SurveillanceDrone::*;
 	import SurveillanceDroneBehavior::*;
 

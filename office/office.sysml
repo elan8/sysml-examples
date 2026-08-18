@@ -10,6 +10,7 @@ package Office {
 	private import ScalarValues::Real;
 	private import ScalarValues::String;
 	private import ScalarValues::Boolean;
+	private import StandardViewDefinitions::*;
 
 	// ========== Port definitions ==========
 	port def PowerOutletPort {
