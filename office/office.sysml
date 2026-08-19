@@ -44,6 +44,7 @@ package Office {
 		port power : ~PowerOutletPort;
 		port usb1 : UsbHostPort;
 		port usb2 : UsbHostPort;
+		port usb3 : UsbHostPort;
 		exhibit state sessionState : WorkSessionStateMachine;
 	}
 
@@ -81,8 +82,8 @@ package Office {
 		connect laptop.power to wallSocket.power;
 		connect laptop.usb1 to mouse.usb;
 		connect laptop.usb2 to keyboard.usb;
-		//connect monitor.power to wallSocket.power;
-		//connect laptop.usb1 to headSet.usb;
+		connect monitor.power to wallSocket.power;
+		connect laptop.usb3 to headSet.usb;
 	}
 
 	view structure : GeneralView{
