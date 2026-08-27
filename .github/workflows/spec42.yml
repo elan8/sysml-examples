@@ -1,22 +1,10 @@
 name: Spec42
 
+# Automatic runs are disabled for now: the examples depend on parser/engine
+# behaviour that is only on spec42 `main` and not in any release yet (the newest
+# release, v0.50.0, rejects `final` states as transition targets). Re-enable the
+# pull_request / push triggers once a spec42 release catches up.
 on:
-  pull_request:
-    paths:
-      - "**/*.sysml"
-      - "**/*.kerml"
-      - "**/README.md"
-      - "CONTRIBUTING.md"
-      - ".github/workflows/spec42.yml"
-  push:
-    branches:
-      - main
-    paths:
-      - "**/*.sysml"
-      - "**/*.kerml"
-      - "**/README.md"
-      - "CONTRIBUTING.md"
-      - ".github/workflows/spec42.yml"
   workflow_dispatch:
 
 permissions:
