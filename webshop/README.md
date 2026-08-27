@@ -33,31 +33,74 @@ The corresponding views in `Views.sysml` are:
 
 ## About the interaction scenarios (`occurrence def` + `message`)
 
-`CheckoutFlow` and `OrderEventFanout` (in `WebShopArchitecture.sysml`) use the standard
-SysML v2 interaction vocabulary — no locally invented `Lifeline` / `Message` types:
+`CheckoutFlow` and `OrderEventFanout` (in `WebShopArchitecture.sysml`) are the two
+`SequenceView` scenarios. They use the standard SysML v2 interaction vocabulary
+(SysML v2.0 §7.13 / §7.16, and §9.2.20 for `SequenceView`).
 
-- The scenario is an **`occurrence def`**.
-- Each **lifeline** is a `part` typed by an architecture part def (`Storefront`,
-  `CheckoutService`, `OrdersEventsTopic`, ...), carrying `event occurrence` features
-  ordered top-to-bottom with `then`. These are the lifeline columns.
-- Each **`message`** connects a send event to a receive event
-  (`message submitCheckout of CheckoutRequest from storefront.submitSent to
-  apiGateway.submitReceived;`). The `of <ItemDef>` clause is the optional payload.
-- **`succession first m1 then m2;`** fixes the order the messages occur in — the
-  diagram never infers order from declaration order.
+### The pattern
+
+```sysml
+occurrence def CheckoutFlow {
+    // Each lifeline is a `part` typed by a real architecture part def.
+    // Its `event occurrence` features, chained with `then`, are the points
+    // on the lifeline where messages are sent or received, top to bottom.
+    part storefront : Storefront {
+        event occurrence submitSent;
+        then event occurrence outcomeReceived;
+    }
+    part apiGateway : ApiGateway {
+        event occurrence submitReceived;
+        then event occurrence forwardSent;
+        // ...
+    }
+
+    // Each message runs from a send event to a receive event.
+    // `of <ItemDef>` is the optional payload type.
+    message submitCheckout of CheckoutRequest
+        from storefront.submitSent to apiGateway.submitReceived;
+
+    // `succession` fixes the order the messages occur in.
+    succession first submitCheckout then forwardCheckout;
+}
+```
 
 `CheckoutFlow` models the nominal payment-approved path; the payment-declined branch is
-covered by `WebShopBehavior::OrderLifecycleStateMachine`.
+covered by `WebShopBehavior::OrderLifecycleStateMachine` (transition `fail_payment`).
+The same skeleton — `occurrence def`, typed `part` lifelines with ordered
+`event occurrence`s, `message`, `succession` — is all you need for your own sequence
+scenarios.
 
-This is the portable, spec-conformant way to model an interaction (SysML v2.0 §7.13 /
-§7.16, and §9.2.20 for `SequenceView`). See the standard training models
-`Interaction Example-1` and the pub/sub sequence example for the same pattern.
+### How Spec42 picks lifelines and messages
+
+There is **no marker type and no naming convention**. Spec42 classifies elements in a
+`SequenceView` by their SysML v2 semantic kind:
+
+- a `part` (`PartUsage`), `port` (`PortUsage`), or `actor` (`ActorUsage`) in the exposed
+  scope is a **lifeline / participant**;
+- a `message` (a `FlowUsage`) is a **message edge**, with its ends resolved from the
+  `from` / `to` events;
+- `event occurrence` order (`then`) and `succession` between messages give the
+  **time order**.
+
+An earlier version of this example defined its own `part def Lifeline` / `part def
+Message` / `SynchronousCall` / `AltFragment` hierarchy. That was never required — those
+were just plain parts named suggestively — and Spec42 does not look at element names, so
+the approach is not used here.
+
+### `action def` / `send` / `accept`
+
+`message` models the *abstract logical* interaction that a `SequenceView` reads. Per
+SysML v2.0 §7.16.2, a message can be *realized* more concretely by a `send` action on the
+sender and a matching `accept` action on the receiver (or by streaming / succession
+flows). This example stays at the `message` level; a lower-level model would add the
+send/accept actions and bind them to the message. Modelling an interaction *only* with
+`action def` + `send` / `accept` and no `message` does not currently feed `SequenceView`.
 
 > **Tooling note.** Spec42's `SequenceView` renderer currently projects the lifelines
-> but not yet the `message` edges or their ordering (`message`/`FlowUsage` lowering is a
-> known Spec42 gap). The model is written to be correct now; the diagram will fill in
-> as Spec42 catches up. Tracked in `elan8/spec42` — see the issue linked from this
-> repository's `webshop` discussion.
+> but not yet the `message` edges or their ordering (`message` / `FlowUsage` lowering is
+> a known Spec42 gap). The model is written to be correct now; the diagram fills in as
+> Spec42 catches up. Tracked upstream in `elan8/spec42` (SequenceView message
+> projection).
 
 ## Scope
 
