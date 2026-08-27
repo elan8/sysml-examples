@@ -1,4 +1,5 @@
 package Views {
+    private import StandardViewDefinitions::*;
     import WebShopArchitecture::*;
     import WebShopBehavior::*;
     import WebShopRequirements::*;
