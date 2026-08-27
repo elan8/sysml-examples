@@ -99,8 +99,8 @@ send/accept actions and bind them to the message. Modelling an interaction *only
 > **Tooling note.** Spec42's `SequenceView` renderer currently projects the lifelines
 > but not yet the `message` edges or their ordering (`message` / `FlowUsage` lowering is
 > a known Spec42 gap). The model is written to be correct now; the diagram fills in as
-> Spec42 catches up. Tracked upstream in `elan8/spec42` (SequenceView message
-> projection).
+> Spec42 catches up. Tracked in
+> [elan8/spec42#85](https://github.com/elan8/spec42/issues/85).
 
 ## Scope
 
