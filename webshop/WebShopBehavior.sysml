@@ -23,7 +23,7 @@ package WebShopBehavior {
         state paymentPending : PaymentPending;
         state paid : Paid;
         state fulfilled : Fulfilled;
-        state completed : Completed;
+        final completed;
         state failed : Failed;
 
         transition to_payment_pending first created accept PaymentRequested then paymentPending;
