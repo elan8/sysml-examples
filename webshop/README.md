@@ -31,35 +31,33 @@ The corresponding views in `Views.sysml` are:
 - `checkoutPipeline` (`ActionFlowView`)
 - `requirements` (`GeneralView`)
 
-## About the interaction scenarios (`Lifeline` / `Message` parts)
+## About the interaction scenarios (`occurrence def` + `message`)
 
-`CheckoutFlow` and `OrderEventFanout` model their sequences as ordinary structural
-`part` usages, not with behavioral `action def` / `send` / `accept`. The types they use
-— `InteractionScenario`, `Lifeline`, `Message`, `SynchronousCall`, `ReturnMessage`,
-`AsynchronousMessage`, `CreationMessage`, `Activation`, `InteractionOperand`,
-`AltFragment` — are **defined locally at the top of `WebShopArchitecture.sysml`**. They
-are not standard-library elements and carry no built-in behavioral semantics; they are a
-teaching scaffold whose names line up with sequence-diagram vocabulary.
+`CheckoutFlow` and `OrderEventFanout` (in `WebShopArchitecture.sysml`) use the standard
+SysML v2 interaction vocabulary — no locally invented `Lifeline` / `Message` types:
 
-A scenario is a `part def :> InteractionScenario` that contains:
+- The scenario is an **`occurrence def`**.
+- Each **lifeline** is a `part` typed by an architecture part def (`Storefront`,
+  `CheckoutService`, `OrdersEventsTopic`, ...), carrying `event occurrence` features
+  ordered top-to-bottom with `then`. These are the lifeline columns.
+- Each **`message`** connects a send event to a receive event
+  (`message submitCheckout of CheckoutRequest from storefront.submitSent to
+  apiGateway.submitReceived;`). The `of <ItemDef>` clause is the optional payload.
+- **`succession first m1 then m2;`** fixes the order the messages occur in — the
+  diagram never infers order from declaration order.
 
-- one `part <name> : Lifeline` per participant (these become the lifeline columns), and
-- one `part <name> : SynchronousCall` (or `ReturnMessage`, `AsynchronousMessage`, ...)
-  per message, each fixing its endpoints with `ref from : Lifeline = <lifeline>` and
-  `ref to : Lifeline = <lifeline>`. `Activation` and `AltFragment` group messages.
+`CheckoutFlow` models the nominal payment-approved path; the payment-declined branch is
+covered by `WebShopBehavior::OrderLifecycleStateMachine`.
 
-What Spec42's `SequenceView` renders from this is deliberately conservative: it projects
-the **exposed lifelines** and the authored message endpoints. Per the diagram-view query
-contract, message ordering, activations, and interaction fragments are shown only when
-the analysis publication publishes those facts — the renderer never fabricates an order
-or an activation from element names or declaration order. So treat the `part`-ordering in
-the source as documentation of intent; the diagram reflects only what the engine can
-resolve authoritatively.
+This is the portable, spec-conformant way to model an interaction (SysML v2.0 §7.13 /
+§7.16, and §9.2.20 for `SequenceView`). See the standard training models
+`Interaction Example-1` and the pub/sub sequence example for the same pattern.
 
-If you are building your own interaction model, you can follow this same local-scaffold
-pattern, or use standard SysML v2 behavioral constructs (`action def`, `perform`,
-`send` / `accept`, item flows) — the standard constructs are the portable choice; this
-example uses the structural pattern to keep the scenario readable as plain text.
+> **Tooling note.** Spec42's `SequenceView` renderer currently projects the lifelines
+> but not yet the `message` edges or their ordering (`message`/`FlowUsage` lowering is a
+> known Spec42 gap). The model is written to be correct now; the diagram will fill in
+> as Spec42 catches up. Tracked in `elan8/spec42` — see the issue linked from this
+> repository's `webshop` discussion.
 
 ## Scope
 

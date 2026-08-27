@@ -25,32 +25,6 @@ package WebShopArchitecture {
         attribute systemName : String;
     }
 
-    part def InteractionScenario;
-    part def Lifeline;
-
-    part def Message {
-        attribute label : String;
-        ref from : Lifeline;
-        ref to : Lifeline;
-    }
-
-    part def SynchronousCall :> Message;
-    part def ReturnMessage :> Message;
-    part def AsynchronousMessage :> Message;
-    part def CreationMessage :> Message;
-
-    part def Activation {
-        ref on : Lifeline;
-        ref startMessage : Message;
-        ref finishMessage : Message;
-    }
-
-    part def InteractionOperand {
-        attribute guard : String;
-    }
-
-    part def AltFragment;
-
     part def Storefront :> SoftwareModule {
         attribute :>> moduleName = "web-storefront";
         port checkoutApiOut;
@@ -143,6 +117,10 @@ package WebShopArchitecture {
         port emailIngress;
     }
 
+    part def OrderProjection :> SoftwareModule {
+        attribute :>> moduleName = "order-projection";
+    }
+
     part def WebShopSystem {
         part storefront : Storefront;
         part apiGateway : ApiGateway;
@@ -184,151 +162,139 @@ package WebShopArchitecture {
         connect notificationService.emailOut to emailProvider.emailIngress;
     }
 
-    part def CheckoutFlow :> InteractionScenario {
-        part storefront : Lifeline;
-        part apiGateway : Lifeline;
-        part checkoutService : Lifeline;
-        part paymentsService : Lifeline;
-        part inventoryService : Lifeline;
-        part ordersEventsTopic : Lifeline;
-        part notificationService : Lifeline;
+    // ----- Interaction scenarios ----------------------------------------------
+    // Sequence scenarios use the standard SysML v2 interaction vocabulary
+    // (SysML v2.0 clause 7.13 / 7.16 and 9.2.20 SequenceView):
+    //   - an `occurrence def` is the scenario;
+    //   - each lifeline is a `part` typed by an architecture part def, carrying
+    //     `event occurrence` features ordered top-to-bottom with `then`;
+    //   - each `message` connects a send event to a receive event and may be
+    //     typed by a payload `item def` after `of`;
+    //   - `succession first m1 then m2;` fixes the order the messages occur in.
+    // `Views::checkoutFlow` and `Views::orderEventFanout` expose these as
+    // SequenceViews.
 
-        part submitCheckout : SynchronousCall {
-            ref from : Lifeline = storefront;
-            ref to : Lifeline = apiGateway;
-            attribute :>> label = "POST /checkout";
+    item def CheckoutRequest;
+    item def CheckoutOutcome;
+    item def PaymentAuthorization;
+    item def PaymentResult;
+    item def StockReservation;
+    item def OrderCreatedEvent;
+    item def ReservationEvent;
+    item def NotificationRequest;
+    item def OrderProjectionCommand;
+
+    occurrence def CheckoutFlow {
+        doc /*
+         * Nominal (payment-approved) checkout. If payment is declined, the
+         * checkout ends with a rejection to the storefront and no order-created
+         * event is published; that branch is modeled in
+         * WebShopBehavior::OrderLifecycleStateMachine (transition `fail_payment`).
+         */
+
+        part storefront : Storefront {
+            event occurrence submitSent;
+            then event occurrence outcomeReceived;
+        }
+        part apiGateway : ApiGateway {
+            event occurrence submitReceived;
+            then event occurrence forwardSent;
+            then event occurrence outcomeReceived;
+            then event occurrence outcomeForwarded;
+        }
+        part checkoutService : CheckoutService {
+            event occurrence forwardReceived;
+            then event occurrence authorizeSent;
+            then event occurrence authorizeReturned;
+            then event occurrence reserveSent;
+            then event occurrence reserveReturned;
+            then event occurrence orderCreatedSent;
+            then event occurrence outcomeSent;
+        }
+        part paymentsService : PaymentsService {
+            event occurrence authorizeReceived;
+            then event occurrence authorizeAnswered;
+        }
+        part inventoryService : InventoryService {
+            event occurrence reserveReceived;
+            then event occurrence reserveAnswered;
+        }
+        part ordersEventsTopic : OrdersEventsTopic {
+            event occurrence orderCreatedReceived;
         }
 
-        part forwardCheckout : SynchronousCall {
-            ref from : Lifeline = apiGateway;
-            ref to : Lifeline = checkoutService;
-            attribute :>> label = "forward checkout request";
-        }
+        message submitCheckout of CheckoutRequest
+            from storefront.submitSent to apiGateway.submitReceived;
+        message forwardCheckout of CheckoutRequest
+            from apiGateway.forwardSent to checkoutService.forwardReceived;
+        message authorizePayment of PaymentAuthorization
+            from checkoutService.authorizeSent to paymentsService.authorizeReceived;
+        message paymentApproved of PaymentResult
+            from paymentsService.authorizeAnswered to checkoutService.authorizeReturned;
+        message reserveStock of StockReservation
+            from checkoutService.reserveSent to inventoryService.reserveReceived;
+        message stockReserved of StockReservation
+            from inventoryService.reserveAnswered to checkoutService.reserveReturned;
+        message publishOrderCreated of OrderCreatedEvent
+            from checkoutService.orderCreatedSent to ordersEventsTopic.orderCreatedReceived;
+        message checkoutAccepted of CheckoutOutcome
+            from checkoutService.outcomeSent to apiGateway.outcomeReceived;
+        message checkoutOutcome of CheckoutOutcome
+            from apiGateway.outcomeForwarded to storefront.outcomeReceived;
 
-        part authorizePayment : SynchronousCall {
-            ref from : Lifeline = checkoutService;
-            ref to : Lifeline = paymentsService;
-            attribute :>> label = "authorize payment";
-        }
-
-        part reserveInventory : SynchronousCall {
-            ref from : Lifeline = checkoutService;
-            ref to : Lifeline = inventoryService;
-            attribute :>> label = "reserve stock";
-        }
-
-        part checkoutExecution : Activation {
-            ref on : Lifeline = checkoutService;
-            ref startMessage : Message = forwardCheckout;
-            ref finishMessage : Message = checkoutAccepted;
-        }
-
-        part paymentOutcome : AltFragment {
-            part approved : InteractionOperand {
-                attribute :>> guard = "payment approved";
-
-                part paymentApproved : ReturnMessage {
-                    ref from : Lifeline = paymentsService;
-                    ref to : Lifeline = checkoutService;
-                    attribute :>> label = "approved";
-                }
-
-                part inventoryReserved : ReturnMessage {
-                    ref from : Lifeline = inventoryService;
-                    ref to : Lifeline = checkoutService;
-                    attribute :>> label = "stock reserved";
-                }
-
-                part publishOrderCreated : AsynchronousMessage {
-                    ref from : Lifeline = checkoutService;
-                    ref to : Lifeline = ordersEventsTopic;
-                    attribute :>> label = "publish order-created";
-                }
-
-                part checkoutAccepted : ReturnMessage {
-                    ref from : Lifeline = checkoutService;
-                    ref to : Lifeline = apiGateway;
-                    attribute :>> label = "201 Created";
-                }
-
-                part apiResponse : ReturnMessage {
-                    ref from : Lifeline = apiGateway;
-                    ref to : Lifeline = storefront;
-                    attribute :>> label = "checkout accepted";
-                }
-            }
-
-            part declined : InteractionOperand {
-                attribute :>> guard = "payment declined";
-
-                part paymentDeclined : ReturnMessage {
-                    ref from : Lifeline = paymentsService;
-                    ref to : Lifeline = checkoutService;
-                    attribute :>> label = "declined";
-                }
-
-                part checkoutRejected : ReturnMessage {
-                    ref from : Lifeline = checkoutService;
-                    ref to : Lifeline = apiGateway;
-                    attribute :>> label = "402 Payment Required";
-                }
-
-                part rejectionResponse : ReturnMessage {
-                    ref from : Lifeline = apiGateway;
-                    ref to : Lifeline = storefront;
-                    attribute :>> label = "payment failed";
-                }
-            }
-        }
+        succession first submitCheckout then forwardCheckout;
+        succession first forwardCheckout then authorizePayment;
+        succession first authorizePayment then paymentApproved;
+        succession first paymentApproved then reserveStock;
+        succession first reserveStock then stockReserved;
+        succession first stockReserved then publishOrderCreated;
+        succession first publishOrderCreated then checkoutAccepted;
+        succession first checkoutAccepted then checkoutOutcome;
     }
 
-    part def OrderEventFanout :> InteractionScenario {
-        part checkoutService : Lifeline;
-        part ordersEventsTopic : Lifeline;
-        part inventoryService : Lifeline;
-        part notificationService : Lifeline;
-        part orderProjection : Lifeline;
+    occurrence def OrderEventFanout {
+        doc /* Asynchronous fan-out of the order-created event after a successful checkout. */
 
-        part publishOrderCreated : AsynchronousMessage {
-            ref from : Lifeline = checkoutService;
-            ref to : Lifeline = ordersEventsTopic;
-            attribute :>> label = "order-created";
+        part checkoutService : CheckoutService {
+            event occurrence orderCreatedSent;
+        }
+        part ordersEventsTopic : OrdersEventsTopic {
+            event occurrence orderCreatedReceived;
+            then event occurrence projectionRequested;
+            then event occurrence inventoryDelivered;
+            then event occurrence notificationDelivered;
+            then event occurrence reservationReceived;
+            then event occurrence confirmationReceived;
+        }
+        part orderProjection : OrderProjection {
+            event occurrence projectionCreated;
+        }
+        part inventoryService : InventoryService {
+            event occurrence orderCreatedReceived;
+            then event occurrence reservationPublished;
+        }
+        part notificationService : NotificationService {
+            event occurrence orderCreatedReceived;
+            then event occurrence confirmationRequested;
         }
 
-        part createProjection : CreationMessage {
-            ref from : Lifeline = ordersEventsTopic;
-            ref to : Lifeline = orderProjection;
-            attribute :>> label = "create order projection";
-        }
+        message publishOrderCreated of OrderCreatedEvent
+            from checkoutService.orderCreatedSent to ordersEventsTopic.orderCreatedReceived;
+        message createProjection of OrderProjectionCommand
+            from ordersEventsTopic.projectionRequested to orderProjection.projectionCreated;
+        message deliverToInventory of OrderCreatedEvent
+            from ordersEventsTopic.inventoryDelivered to inventoryService.orderCreatedReceived;
+        message deliverToNotifications of OrderCreatedEvent
+            from ordersEventsTopic.notificationDelivered to notificationService.orderCreatedReceived;
+        message inventoryReserved of ReservationEvent
+            from inventoryService.reservationPublished to ordersEventsTopic.reservationReceived;
+        message confirmationRequested of NotificationRequest
+            from notificationService.confirmationRequested to ordersEventsTopic.confirmationReceived;
 
-        part fanOutInventory : AsynchronousMessage {
-            ref from : Lifeline = ordersEventsTopic;
-            ref to : Lifeline = inventoryService;
-            attribute :>> label = "deliver order-created";
-        }
-
-        part fanOutNotifications : AsynchronousMessage {
-            ref from : Lifeline = ordersEventsTopic;
-            ref to : Lifeline = notificationService;
-            attribute :>> label = "deliver order-created";
-        }
-
-        part inventoryProcessing : Activation {
-            ref on : Lifeline = inventoryService;
-            ref startMessage : Message = fanOutInventory;
-            ref finishMessage : Message = reservationPublished;
-        }
-
-        part notifyCustomer : AsynchronousMessage {
-            ref from : Lifeline = notificationService;
-            ref to : Lifeline = ordersEventsTopic;
-            attribute :>> label = "confirmation-requested";
-        }
-
-        part reservationPublished : AsynchronousMessage {
-            ref from : Lifeline = inventoryService;
-            ref to : Lifeline = ordersEventsTopic;
-            attribute :>> label = "inventory-reserved";
-        }
+        succession first publishOrderCreated then createProjection;
+        succession first createProjection then deliverToInventory;
+        succession first deliverToInventory then deliverToNotifications;
+        succession first deliverToNotifications then inventoryReserved;
+        succession first inventoryReserved then confirmationRequested;
     }
 }
