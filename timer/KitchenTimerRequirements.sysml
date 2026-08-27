@@ -7,7 +7,7 @@ package KitchenTimerRequirements {
 	private import ISQElectromagnetism::ElectricChargeValue;
 
 	requirement def TimerRangeReq {
-		subject mcu : Microcontroller;
+		subject mcu : MCU;
 		doc /* The controller shall support a configurable countdown range from 0:01 to 99:59. */
 		require constraint { doc /* The configured countdown value stays within the supported timer range. */ }
 	}
@@ -19,7 +19,7 @@ package KitchenTimerRequirements {
 	}
 
 	requirement def AccuracyReq {
-		subject mcu : Microcontroller;
+		subject mcu : MCU;
 		doc /* The controller shall keep elapsed-time error within +/-1 second per minute. */
 		require constraint { doc /* Tick handling and countdown accumulation stay within the stated timing tolerance. */ }
 	}
@@ -31,13 +31,13 @@ package KitchenTimerRequirements {
 	}
 
 	requirement def ButtonResponsivenessReq {
-		subject mcu : Microcontroller;
+		subject mcu : MCU;
 		doc /* The controller shall acknowledge button events within 100 ms. */
 		require constraint { doc /* Input handling keeps button-to-response latency at or below 100 ms. */ }
 	}
 
 	requirement def StateConsistencyReq {
-		subject mcu : Microcontroller;
+		subject mcu : MCU;
 		doc /* The controller state machine shall remain in one mutually exclusive timer mode at a time. */
 		require constraint { doc /* Idle, Running, Paused, and Expired remain mutually exclusive controller states. */ }
 	}

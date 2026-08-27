@@ -8,7 +8,7 @@ package KitchenTimerStructure {
 	private import ISQElectromagnetism::ElectricPotentialDifferenceValue;
 	private import ISQSpaceTime::FrequencyValue;
 
-	part def Microcontroller {
+	part def MCU {
 		doc /* MCU on PCB with built-in LCD controller; runs timer firmware; COM/SEG to display glass, GPIO to buttons. */
 		attribute clockFrequency : FrequencyValue;
 		attribute flashSize : Real;
@@ -48,9 +48,9 @@ package KitchenTimerStructure {
 		port pwr : ~BatteryOutlet { :>> maxCurrent = 0.05 [A]; }
 	}
 
-	part def TimerPCB {
+	part def PCB {
 		doc /* PCB assembly; display and buttons mounted on board; MCU and buzzer driver. */
-		part mcu : Microcontroller;
+		part mcu : MCU;
 		part display : Display;
 		part buttons : ButtonInterface;
 		part buzzerDriver : BuzzerDriver;
@@ -68,11 +68,17 @@ package KitchenTimerStructure {
 		port powerOut : BatteryOutlet;
 	}
 
+	part def Housing {
+		part frontCover;
+		part backCover;
+	 }
+
 	part def KitchenTimer {
 		doc /* Battery-powered kitchen timer; PCB with MCU, display, buttons, buzzer driver; buzzer off-board. */
-		part pcb : TimerPCB;
+		part pcb : PCB;
 		part battery : Battery;
 		part buzzer : Buzzer;
+		part housing : Housing;
 
 		connect battery.powerOut to pcb.mcu.pwr;
 		connect battery.powerOut to pcb.display.pwr;
@@ -80,5 +86,6 @@ package KitchenTimerStructure {
 		connect battery.powerOut to pcb.buzzerDriver.pwrIn;
 		connect pcb.buzzerDriver.buzzerPwrOut to buzzer.pwr;
 	}
+
 
 }
