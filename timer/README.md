@@ -53,7 +53,8 @@ The corresponding views in `Views.sysml` are:
 - `TimerStateMachine` for the main behavioral flow
 - the port definitions for button, display, buzzer, and battery interactions
 - the requirement definitions and `satisfy` usages in `KitchenTimer.sysml`
-- the `TimerPCB` decomposition as a bridge between logical and implementation-oriented views
+- the `PCB` decomposition as a bridge between logical and implementation-oriented views
+- `Housing` (`frontCover` / `backCover`) as a minimal mechanical enclosure part
 
 **Two display ports:** `DisplayCommandPort` is the logical value (MM:SS string) from firmware; `LcdSegmentDrivePort` is the physical COM/SEG drive to the glass. Both are intentional.
 
@@ -88,7 +89,7 @@ Read the model in this order:
 
 1. `KitchenTimer.sysml` — `timerInstance` and `satisfy` relations
 2. `KitchenTimerPorts.sysml` — typed interfaces
-3. `KitchenTimerStructure.sysml` — `KitchenTimer`, `TimerPCB`, and power fan-out
+3. `KitchenTimerStructure.sysml` — `KitchenTimer`, `PCB`, `Housing`, and power fan-out
 4. `KitchenTimerBehavior.sysml` — `TimerStateMachine`
 5. `KitchenTimerRequirements.sysml` — requirements and use cases
 6. `Views.sysml` — `structure` for parts and ports only; `connections` for wiring; `timerStateMachine` for the state diagram

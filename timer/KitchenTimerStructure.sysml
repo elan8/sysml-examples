@@ -68,10 +68,15 @@ package KitchenTimerStructure {
 		port powerOut : BatteryOutlet;
 	}
 
+	part def Cover {
+		doc /* One half of the two-piece enclosure shell. */
+	}
+
 	part def Housing {
-		part frontCover;
-		part backCover;
-	 }
+		doc /* Two-piece plastic enclosure that holds the PCB, battery, and buzzer. */
+		part frontCover : Cover;
+		part backCover : Cover;
+	}
 
 	part def KitchenTimer {
 		doc /* Battery-powered kitchen timer; PCB with MCU, display, buttons, buzzer driver; buzzer off-board. */
@@ -86,6 +91,5 @@ package KitchenTimerStructure {
 		connect battery.powerOut to pcb.buzzerDriver.pwrIn;
 		connect pcb.buzzerDriver.buzzerPwrOut to buzzer.pwr;
 	}
-
 
 }

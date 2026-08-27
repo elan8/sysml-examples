@@ -13,7 +13,7 @@ Model a realistic office workstation used for engineering and analysis tasks: la
 From the repository root:
 
 ```bash
-spec42 check examples/office/office.sysml
+spec42 check office/office.sysml
 ```
 
 In VS Code, open `office.sysml` and use hover, go-to-definition, and Model Explorer to follow the ports, parts, and `satisfy` relationships.
@@ -33,7 +33,7 @@ In VS Code, open `office.sysml` and use hover, go-to-definition, and Model Explo
 
 ## What To Inspect In The Model
 
-- `OfficeDeskSetup` for the main parts and connections
+- `OfficeWorkplace` for the main parts and connections
 - the port definitions for the power, HDMI, and USB examples
 - `WorkSessionStateMachine` for the smallest behavior example in the repo
 - `officeInstance` and the `satisfy` usages for traceability
