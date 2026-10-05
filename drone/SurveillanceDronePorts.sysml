@@ -34,7 +34,7 @@ package SurveillanceDronePorts {
 	port def PowerPort {
 		out power : electricPower;
 		attribute voltage = 12.0 [V];
-		attribute maxCurrent = 1.0 [A];
+		attribute maxCurrent default = 1.0 [A];
 	}
 
 	port def SensorDataPort {
