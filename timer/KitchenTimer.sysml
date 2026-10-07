@@ -11,11 +11,11 @@ package KitchenTimer {
 
 	part timerInstance : KitchenTimer;
 
-	satisfy TimerRangeReq by timerInstance.pcb.mcu;
-	satisfy DisplayFormatReq by timerInstance.pcb.display;
-	satisfy AccuracyReq by timerInstance.pcb.mcu;
-	satisfy BuzzerAudibilityReq by timerInstance.buzzer;
-	satisfy ButtonResponsivenessReq by timerInstance.pcb.mcu;
-	satisfy StateConsistencyReq by timerInstance.pcb.mcu;
-	satisfy BatteryRuntimeReq by timerInstance.battery;
+	satisfy requirement : TimerRangeReq by timerInstance.pcb.mcu;
+	satisfy requirement : DisplayFormatReq by timerInstance.pcb.display;
+	satisfy requirement : AccuracyReq by timerInstance.pcb.mcu;
+	satisfy requirement : BuzzerAudibilityReq by timerInstance.buzzer;
+	satisfy requirement : ButtonResponsivenessReq by timerInstance.pcb.mcu;
+	satisfy requirement : StateConsistencyReq by timerInstance.pcb.mcu;
+	satisfy requirement : BatteryRuntimeReq by timerInstance.battery;
 }

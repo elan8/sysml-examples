@@ -151,10 +151,10 @@ package Office {
 	}
 
 	part officeInstance : OfficeWorkplace;
-	satisfy ProductivityComputerReq by officeInstance.laptop;
-	satisfy ExternalDisplayReq by officeInstance;
-	satisfy InputDeviceReq by officeInstance;
-	satisfy ContinuousPowerReq by officeInstance;
+	satisfy requirement : ProductivityComputerReq by officeInstance.laptop;
+	satisfy requirement : ExternalDisplayReq by officeInstance;
+	satisfy requirement : InputDeviceReq by officeInstance;
+	satisfy requirement : ContinuousPowerReq by officeInstance;
 
 	// ========== Use cases ==========
 	item def OfficeUser;
