@@ -6,7 +6,7 @@ package KitchenTimerPorts {
 
 	port def BatteryOutlet {
 		doc /* DC power source; e.g. 3xAAA = 4.5 V, max 0.5 A. */
-		out power : electricPower;
+		out power :> electricPower;
 		attribute voltage = 4.5 [V];
 		attribute maxCurrent default = 0.5 [A];
 	}

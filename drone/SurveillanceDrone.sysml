@@ -11,14 +11,14 @@ package SurveillanceDrone {
 
 	part droneInstance : SurveillanceQuadrotorDrone;
 
-	satisfy EnduranceReq by droneInstance;
-	satisfy MaxAltitudeAGLReq by droneInstance;
-	satisfy WindToleranceReq by droneInstance;
-	satisfy VideoLatencyReq by droneInstance.communication;
-	satisfy FailsafeReq by droneInstance.flightControl.flightController;
-	satisfy GeofencingReq by droneInstance.flightControl;
-	satisfy RemoteIDReq by droneInstance;
-	satisfy GimbalPanTiltReq by droneInstance.gimbal;
-	satisfy ControlModesReq by droneInstance.flightControl.flightController;
-	satisfy OperatingTempReq by droneInstance;
+	satisfy requirement : EnduranceReq by droneInstance;
+	satisfy requirement : MaxAltitudeAGLReq by droneInstance;
+	satisfy requirement : WindToleranceReq by droneInstance;
+	satisfy requirement : VideoLatencyReq by droneInstance.communication;
+	satisfy requirement : FailsafeReq by droneInstance.flightControl.flightController;
+	satisfy requirement : GeofencingReq by droneInstance.flightControl;
+	satisfy requirement : RemoteIDReq by droneInstance;
+	satisfy requirement : GimbalPanTiltReq by droneInstance.gimbal;
+	satisfy requirement : ControlModesReq by droneInstance.flightControl.flightController;
+	satisfy requirement : OperatingTempReq by droneInstance;
 }

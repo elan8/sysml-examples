@@ -11,10 +11,10 @@ package TrafficLightIntersection {
 
 	part intersectionInstance : TrafficLightIntersection;
 
-	satisfy NoConflictingGreensReq by intersectionInstance;
-	satisfy ClearanceTimeReq by intersectionInstance;
-	satisfy FailSafeReq by intersectionInstance;
-	satisfy PhaseSequenceReq by intersectionInstance.controller;
-	satisfy ModesReq by intersectionInstance.controller;
-	satisfy VisibilityReq by intersectionInstance;
+	satisfy requirement : NoConflictingGreensReq by intersectionInstance;
+	satisfy requirement : ClearanceTimeReq by intersectionInstance;
+	satisfy requirement : FailSafeReq by intersectionInstance;
+	satisfy requirement : PhaseSequenceReq by intersectionInstance.controller;
+	satisfy requirement : ModesReq by intersectionInstance.controller;
+	satisfy requirement : VisibilityReq by intersectionInstance;
 }
