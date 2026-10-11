@@ -32,6 +32,32 @@ The corresponding views in `Views.sysml` are:
 - `connections` (`InterconnectionView`) — subsystem and power wiring
 - `flightModeStateMachine` (`StateTransitionView`) — `FlightModeStateMachine` behavior definition
 
+## Requirement And Quantity Patterns
+
+The requirement definitions are reusable types. The aggregator declares an anonymous
+requirement usage and asserts its satisfaction by a concrete part:
+
+```sysml
+satisfy requirement : EnduranceReq by droneInstance;
+```
+
+For a requirement that needs a name for later tracing or verification, use the equivalent
+named pattern instead:
+
+```sysml
+requirement endurance : EnduranceReq;
+satisfy endurance by droneInstance;
+```
+
+The short `satisfy endurance` form references a requirement usage. `EnduranceReq` is a
+definition, so it belongs after the typing operator `:`. These satisfaction assertions
+express the intended design claim; they do not provide test or analysis evidence.
+
+In `PowerPort`, `out power :> electricPower;` subsets the ISQ quantity feature and inherits
+its power value type. `electricPower` is an attribute usage, so `: electricPower` would
+incorrectly use a feature as a type. The port's `maxCurrent` is a default value so individual
+power ports can redefine it for their loads.
+
 ## What Is Intentionally Simplified
 
 - many domain concepts are modeled at sketch level to keep the model readable across files

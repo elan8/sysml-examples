@@ -58,6 +58,31 @@ The corresponding views in `Views.sysml` are:
 
 **Two display ports:** `DisplayCommandPort` is the logical value (MM:SS string) from firmware; `LcdSegmentDrivePort` is the physical COM/SEG drive to the glass. Both are intentional.
 
+## Requirement And Quantity Patterns
+
+`KitchenTimerRequirements.sysml` supplies reusable requirement definitions. The aggregator
+declares anonymous usages of them and asserts satisfaction by the relevant components:
+
+```sysml
+satisfy requirement : TimerRangeReq by timerInstance.pcb.mcu;
+```
+
+To give the requirement a name for later tracing or verification, use this pattern instead:
+
+```sysml
+requirement timerRange : TimerRangeReq;
+satisfy timerRange by timerInstance.pcb.mcu;
+```
+
+The short `satisfy timerRange` form references a requirement usage; it cannot reference the
+definition `TimerRangeReq` directly. Satisfaction is a design assertion, with verification
+evidence still to be supplied.
+
+`BatteryOutlet` declares `out power :> electricPower;` because the imported ISQ
+`electricPower` is a quantity feature whose values have a power type. Subsetting with `:>`
+inherits that type. The `maxCurrent` default can be redefined by a consuming port, while
+`voltage` remains a fixed binding in this teaching model.
+
 ## Known Limitations
 
 - this is a teaching example, not a validated appliance design
