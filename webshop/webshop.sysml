@@ -1,7 +1,7 @@
 package WebShopExample {
-    import WebShopArchitecture::*;
-    import WebShopRequirements::*;
-    import WebShopBehavior::*;
+    private import WebShopArchitecture::*;
+    private import WebShopRequirements::*;
+    private import WebShopBehavior::*;
     private import ScalarValues::String;
 
     part def KubernetesCluster {

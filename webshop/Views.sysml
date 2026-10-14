@@ -1,9 +1,9 @@
 package Views {
     private import StandardViewDefinitions::*;
-    import WebShopArchitecture::*;
-    import WebShopBehavior::*;
-    import WebShopRequirements::*;
-    import WebShopExample::*;
+    private import WebShopArchitecture::*;
+    private import WebShopBehavior::*;
+    private import WebShopRequirements::*;
+    private import WebShopExample::*;
 
     view structure : GeneralView {
         expose WebShopExample::webshopSystem;

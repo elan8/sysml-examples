@@ -1,7 +1,7 @@
 package Views {
 	private import StandardViewDefinitions::*;
-	import KitchenTimer::*;
-	import KitchenTimerBehavior::*;
+	private import KitchenTimer::*;
+	private import KitchenTimerBehavior::*;
 
 	view structure : GeneralView {
 		doc /*

@@ -1,5 +1,5 @@
 package KitchenTimerRequirements {
-	import KitchenTimerStructure::*;
+	private import KitchenTimerStructure::*;
 
 	private import ScalarValues::*;
 	private import ISQBase::DurationValue;

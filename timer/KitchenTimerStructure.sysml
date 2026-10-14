@@ -1,6 +1,6 @@
 package KitchenTimerStructure {
-	import KitchenTimerPorts::*;
-	import KitchenTimerBehavior::*;
+	private import KitchenTimerPorts::*;
+	private import KitchenTimerBehavior::*;
 
 	private import ScalarValues::*;
 	private import ISQBase::DurationValue;
