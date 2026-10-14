@@ -1,6 +1,6 @@
 package SurveillanceDroneStructure {
-	import SurveillanceDronePorts::*;
-	import SurveillanceDroneBehavior::*;
+	private import SurveillanceDronePorts::*;
+	private import SurveillanceDroneBehavior::*;
 
 	private import ScalarValues::Real;
 	private import ScalarValues::String;

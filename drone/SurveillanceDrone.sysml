@@ -4,10 +4,10 @@
 package SurveillanceDrone {
 	doc /* Root package for a broad surveillance-drone teaching example. */
 
-	import SurveillanceDronePorts::*;
-	import SurveillanceDroneStructure::*;
-	import SurveillanceDroneBehavior::*;
-	import SurveillanceDroneRequirements::*;
+	private import SurveillanceDronePorts::*;
+	private import SurveillanceDroneStructure::*;
+	private import SurveillanceDroneBehavior::*;
+	private import SurveillanceDroneRequirements::*;
 
 	part droneInstance : SurveillanceQuadrotorDrone;
 

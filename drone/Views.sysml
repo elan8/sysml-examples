@@ -1,7 +1,7 @@
 package Views {
 	private import StandardViewDefinitions::*;
-	import SurveillanceDrone::*;
-	import SurveillanceDroneBehavior::*;
+	private import SurveillanceDrone::*;
+	private import SurveillanceDroneBehavior::*;
 
 	view structure : GeneralView {
 		doc /* Structure only: parts and ports on droneInstance. */

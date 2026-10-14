@@ -1,6 +1,6 @@
 package TrafficLightIntersectionStructure {
-	import TrafficLightIntersectionPorts::*;
-	import TrafficLightIntersectionBehavior::*;
+	private import TrafficLightIntersectionPorts::*;
+	private import TrafficLightIntersectionBehavior::*;
 
 	private import ScalarValues::String;
 	private import ISQBase::DurationValue;

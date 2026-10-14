@@ -4,10 +4,10 @@
 package TrafficLightIntersection {
 	doc /* Root package for a compact traffic-light-controller teaching example. */
 
-	import TrafficLightIntersectionPorts::*;
-	import TrafficLightIntersectionStructure::*;
-	import TrafficLightIntersectionBehavior::*;
-	import TrafficLightIntersectionRequirements::*;
+	private import TrafficLightIntersectionPorts::*;
+	private import TrafficLightIntersectionStructure::*;
+	private import TrafficLightIntersectionBehavior::*;
+	private import TrafficLightIntersectionRequirements::*;
 
 	part intersectionInstance : TrafficLightIntersection;
 

@@ -1,5 +1,5 @@
 package TrafficLightIntersectionRequirements {
-	import TrafficLightIntersectionStructure::*;
+	private import TrafficLightIntersectionStructure::*;
 
 	private import ISQBase::DurationValue;
 	private import ISQBase::LengthValue;

@@ -1,7 +1,7 @@
 package Views {
 	private import StandardViewDefinitions::*;
-	import TrafficLightIntersection::*;
-	import TrafficLightIntersectionBehavior::*;
+	private import TrafficLightIntersection::*;
+	private import TrafficLightIntersectionBehavior::*;
 
 	view structure : GeneralView {
 		doc /* Structure only: parts and ports on intersectionInstance. */

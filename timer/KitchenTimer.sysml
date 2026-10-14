@@ -4,10 +4,10 @@
 package KitchenTimer {
 	doc /* Root package for the kitchen timer teaching example. */
 
-	import KitchenTimerPorts::*;
-	import KitchenTimerStructure::*;
-	import KitchenTimerBehavior::*;
-	import KitchenTimerRequirements::*;
+	private import KitchenTimerPorts::*;
+	private import KitchenTimerStructure::*;
+	private import KitchenTimerBehavior::*;
+	private import KitchenTimerRequirements::*;
 
 	part timerInstance : KitchenTimer;
 

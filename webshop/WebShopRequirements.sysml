@@ -1,5 +1,5 @@
 package WebShopRequirements {
-    import WebShopArchitecture::*;
+    private import WebShopArchitecture::*;
 
     requirement def CheckoutLatencyReq {
         subject checkoutService : CheckoutService;

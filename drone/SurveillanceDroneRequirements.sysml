@@ -1,5 +1,5 @@
 package SurveillanceDroneRequirements {
-	import SurveillanceDroneStructure::*;
+	private import SurveillanceDroneStructure::*;
 
 	private import ScalarValues::Real;
 	private import ISQBase::DurationValue;
