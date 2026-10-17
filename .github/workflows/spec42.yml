@@ -1,10 +1,9 @@
 name: Spec42
 
-# Automatic runs are disabled for now: the examples depend on parser/engine
-# behaviour that is only on spec42 `main` and not in any release yet (the newest
-# release, v0.50.0, rejects `final` states as transition targets). Re-enable the
-# pull_request / push triggers once a spec42 release catches up.
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -21,7 +20,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Check examples with Spec42
-        uses: elan8/spec42@v0.50.0
+        uses: elan8/spec42@v0.56.0
         with:
           path: .
           format: sarif
