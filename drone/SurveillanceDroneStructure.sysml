@@ -3,6 +3,7 @@ package SurveillanceDroneStructure {
 	private import SurveillanceDroneBehavior::*;
 
 	private import ScalarValues::Real;
+	private import SI::ampere;
 	private import ScalarValues::String;
 	private import ISQBase::MassValue;
 	private import ISQBase::LengthValue;

@@ -23,13 +23,12 @@ package WebShopBehavior {
         state paymentPending : PaymentPending;
         state paid : Paid;
         state fulfilled : Fulfilled;
-        final completed;
         state failed : Failed;
 
         transition to_payment_pending first created accept PaymentRequested then paymentPending;
         transition to_paid first paymentPending accept PaymentAuthorized then paid;
         transition to_fulfilled first paid accept InventoryReserved then fulfilled;
-        transition to_completed first fulfilled accept ShipmentConfirmed then completed;
+        transition to_completed first fulfilled accept ShipmentConfirmed then done;
         transition fail_payment first paymentPending accept PaymentDeclined then failed;
         transition fail_inventory first paid accept InventoryRejected then failed;
     }
