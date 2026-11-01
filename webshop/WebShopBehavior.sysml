@@ -23,7 +23,7 @@ package WebShopBehavior {
         state paymentPending : PaymentPending;
         state paid : Paid;
         state fulfilled : Fulfilled;
-        final completed;
+        state completed : Completed;
         state failed : Failed;
 
         transition to_payment_pending first created accept PaymentRequested then paymentPending;
@@ -42,7 +42,7 @@ package WebShopBehavior {
         action authorizePayment { out paymentOk : Boolean; }
         action reserveInventory { out stockReserved : Boolean; }
         action publishOrderCreated { out orderEventPublished : Boolean; }
-        action completeCheckout { out done : Boolean; }
+        action completeCheckout { out checkoutComplete : Boolean; }
 
         first validateCart then authorizePayment;
         first authorizePayment then reserveInventory;

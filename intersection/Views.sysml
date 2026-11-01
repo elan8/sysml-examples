@@ -1,4 +1,4 @@
-package Views {
+package IntersectionViews {
 	private import StandardViewDefinitions::*;
 	private import TrafficLightIntersection::*;
 	private import TrafficLightIntersectionBehavior::*;

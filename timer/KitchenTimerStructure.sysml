@@ -3,6 +3,7 @@ package KitchenTimerStructure {
 	private import KitchenTimerBehavior::*;
 
 	private import ScalarValues::*;
+	private import SI::ampere;
 	private import ISQBase::DurationValue;
 	private import ISQElectromagnetism::ElectricChargeValue;
 	private import ISQElectromagnetism::ElectricPotentialDifferenceValue;
