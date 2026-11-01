@@ -23,12 +23,13 @@ package WebShopBehavior {
         state paymentPending : PaymentPending;
         state paid : Paid;
         state fulfilled : Fulfilled;
+        state completed : Completed;
         state failed : Failed;
 
         transition to_payment_pending first created accept PaymentRequested then paymentPending;
         transition to_paid first paymentPending accept PaymentAuthorized then paid;
         transition to_fulfilled first paid accept InventoryReserved then fulfilled;
-        transition to_completed first fulfilled accept ShipmentConfirmed then done;
+        transition to_completed first fulfilled accept ShipmentConfirmed then completed;
         transition fail_payment first paymentPending accept PaymentDeclined then failed;
         transition fail_inventory first paid accept InventoryRejected then failed;
     }
@@ -41,7 +42,7 @@ package WebShopBehavior {
         action authorizePayment { out paymentOk : Boolean; }
         action reserveInventory { out stockReserved : Boolean; }
         action publishOrderCreated { out orderEventPublished : Boolean; }
-        action completeCheckout { out done : Boolean; }
+        action completeCheckout { out checkoutComplete : Boolean; }
 
         first validateCart then authorizePayment;
         first authorizePayment then reserveInventory;

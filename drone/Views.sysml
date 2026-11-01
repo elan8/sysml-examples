@@ -1,4 +1,4 @@
-package Views {
+package DroneViews {
 	private import StandardViewDefinitions::*;
 	private import SurveillanceDrone::*;
 	private import SurveillanceDroneBehavior::*;

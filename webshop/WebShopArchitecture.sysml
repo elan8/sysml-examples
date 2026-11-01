@@ -171,7 +171,7 @@ package WebShopArchitecture {
     //   - each `message` connects a send event to a receive event and may be
     //     typed by a payload `item def` after `of`;
     //   - `succession first m1 then m2;` fixes the order the messages occur in.
-    // `Views::checkoutFlow` and `Views::orderEventFanout` expose these as
+    // `WebShopViews::checkoutFlow` and `WebShopViews::orderEventFanout` expose these as
     // SequenceViews.
 
     item def CheckoutRequest;

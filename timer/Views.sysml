@@ -1,4 +1,4 @@
-package Views {
+package TimerViews {
 	private import StandardViewDefinitions::*;
 	private import KitchenTimer::*;
 	private import KitchenTimerBehavior::*;

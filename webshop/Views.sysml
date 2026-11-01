@@ -1,4 +1,4 @@
-package Views {
+package WebShopViews {
     private import StandardViewDefinitions::*;
     private import WebShopArchitecture::*;
     private import WebShopBehavior::*;
